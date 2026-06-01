@@ -1,0 +1,6 @@
+[submodule "deploy/real/unitree_sdk2_wrapper"]
+	path = deploy/real/unitree_sdk2_wrapper
+	url = https://github.com/lzyang2000/unitree_sdk2_wrapper.git
+[submodule "deploy/real/dex1_1_service"]
+	path = deploy/real/dex1_1_service
+	url = https://github.com/unitreerobotics/dex1_1_service.git

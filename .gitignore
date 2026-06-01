@@ -1,0 +1,12 @@
+# Python
+*.pyc
+__pycache__
+.venv
+
+# Training / experiment outputs
+wandb
+logs
+
+# Editor / agent tooling
+.vscode
+.claude

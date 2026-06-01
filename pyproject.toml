@@ -1,0 +1,49 @@
+[build-system]
+requires = ["uv_build>=0.8.19,<0.9.0"]
+build-backend = "uv_build"
+
+[project]
+name = "wbc-mjlab"
+version = "0.1.0"
+description = "Fully-stable seed+AMP dual-teacher MoE student training for the Unitree G1"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "mjlab",
+  "torch==2.8.0; sys_platform != 'linux' or platform_machine != 'aarch64'",
+  "torch==2.9.1; sys_platform == 'linux' and platform_machine == 'aarch64'",
+  # Deploy stack (deploy/play_sim_hand.sh / play_real_hand.sh):
+  "onnxruntime",   # ONNX policy inference (hand_policy / sim_policy nodes)
+  "inputs",        # local xbox gamepad reader (xbox_node)
+  "pin",           # pinocchio FK for the wrist leveller (hand_policy / sim_policy)
+  "televuer",      # VR headset teleop bridge (dds_xr_node)
+  "websockets",    # browser gamepad bridge for `xbox server` mode (gamepad_bridge)
+]
+
+[project.entry-points."mjlab.tasks"]
+wbc_mjlab = "wbc_mjlab"
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+
+[[tool.uv.index]]
+name = "pytorch-cu129"
+url = "https://download.pytorch.org/whl/cu129"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+mjlab = { git = "https://github.com/mujocolab/mjlab", tag = "v1.4.0" }
+televuer = { git = "https://github.com/lzyang2000/televuer", branch = "ros" }
+torch = [
+  { index = "pytorch-cu129", marker = "sys_platform == 'linux' and platform_machine == 'x86_64'" },
+  { index = "pytorch-cu130", marker = "sys_platform == 'linux' and platform_machine == 'aarch64'" },
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

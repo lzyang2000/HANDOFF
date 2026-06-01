@@ -1,0 +1,762 @@
+<mujoco model="g1_mocap">
+  <compiler angle="radian" meshdir="../meshes" texturedir="../meshes" eulerseq="xyz" inertiafromgeom="auto"/>
+  <option timestep='0.005' iterations='10' solver='Newton' gravity='0 0 -9.81' cone='elliptic' impratio='10'/>
+  <default>
+    <joint actuatorfrclimited="true" type="hinge"/>
+  </default>
+
+  <asset>
+    <mesh name="pelvis" file="pelvis.STL"/>
+    <mesh name="pelvis_contour_link" file="pelvis_contour_link.STL"/>
+    <mesh name="left_hip_pitch_link" file="left_hip_pitch_link.STL"/>
+    <mesh name="left_hip_roll_link" file="left_hip_roll_link.STL"/>
+    <mesh name="left_hip_yaw_link" file="left_hip_yaw_link.STL"/>
+    <mesh name="left_knee_link" file="left_knee_link.STL"/>
+    <mesh name="left_ankle_pitch_link" file="left_ankle_pitch_link.STL"/>
+    <mesh name="left_ankle_roll_link" file="left_ankle_roll_link.STL"/>
+    <mesh name="right_hip_pitch_link" file="right_hip_pitch_link.STL"/>
+    <mesh name="right_hip_roll_link" file="right_hip_roll_link.STL"/>
+    <mesh name="right_hip_yaw_link" file="right_hip_yaw_link.STL"/>
+    <mesh name="right_knee_link" file="right_knee_link.STL"/>
+    <mesh name="right_ankle_pitch_link" file="right_ankle_pitch_link.STL"/>
+    <mesh name="right_ankle_roll_link" file="right_ankle_roll_link.STL"/>
+    <mesh name="waist_yaw_link" file="waist_yaw_link_rev_1_0.STL"/>
+    <mesh name="waist_roll_link" file="waist_roll_link_rev_1_0.STL"/>
+    <mesh name="torso_link" file="torso_link_rev_1_0.STL"/>
+    <mesh name="logo_link" file="logo_link.STL"/>
+    <mesh name="head_link" file="head_link.STL"/>
+    <mesh name="left_shoulder_pitch_link" file="left_shoulder_pitch_link.STL"/>
+    <mesh name="left_shoulder_roll_link" file="left_shoulder_roll_link.STL"/>
+    <mesh name="left_shoulder_yaw_link" file="left_shoulder_yaw_link.STL"/>
+    <mesh name="left_elbow_link" file="left_elbow_link.STL"/>
+    <mesh name="left_wrist_roll_link" file="left_wrist_roll_link.STL"/>
+    <mesh name="left_wrist_pitch_link" file="left_wrist_pitch_link.STL"/>
+    <mesh name="left_wrist_yaw_link" file="left_wrist_yaw_link.STL"/>
+    <mesh name="left_rubber_hand" file="left_rubber_hand.STL"/>
+    <mesh name="right_shoulder_pitch_link" file="right_shoulder_pitch_link.STL"/>
+    <mesh name="right_shoulder_roll_link" file="right_shoulder_roll_link.STL"/>
+    <mesh name="right_shoulder_yaw_link" file="right_shoulder_yaw_link.STL"/>
+    <mesh name="right_elbow_link" file="right_elbow_link.STL"/>
+    <mesh name="right_wrist_roll_link" file="right_wrist_roll_link.STL"/>
+    <mesh name="right_wrist_pitch_link" file="right_wrist_pitch_link.STL"/>
+    <mesh name="right_wrist_yaw_link" file="right_wrist_yaw_link.STL"/>
+    <mesh name="right_rubber_hand" file="right_rubber_hand.STL"/>
+    <mesh name="gripper_rail_link" file="gripper_rail_link.stl"/>
+    <!-- Modded Dex1-1 chassis + slider pistons -->
+    <mesh name="dex1_base_link" file="dex1_base_link.STL"/>
+    <mesh name="dex1_slider"    file="dex1_slider.STL" scale="0.5 1 1"/>
+    <!-- UMI silicone-pad fingers (MIT, Columbia AIRL 2023) -->
+    <mesh name="umi_finger_holder_L" file="umi_finger_holder_L.stl"/>
+    <mesh name="umi_finger_holder_R" file="umi_finger_holder_R.stl"/>
+    <mesh name="umi_finger_L"        file="umi_finger_L.stl" scale="0.65 0.65 0.65"/>
+    <mesh name="umi_finger_R"        file="umi_finger_R.stl" scale="0.65 0.65 0.65"/>
+    <!-- <mesh name="gripper_hand_fixed_link" file="gripper_hand_fixed_link.stl"/> -->
+  </asset>
+
+  <worldbody>
+    <body name="pelvis" pos="0 0 0.793">
+      <inertial pos="0 0 -0.07605" quat="1 0 -0.000399148 0" mass="3.813" diaginertia="0.010549 0.0093089 0.0079184"/>
+      <freejoint name="pelvis"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="pelvis"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="pelvis_contour_link"/>
+      <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="pelvis_contour_link"/>
+      <site name="imu_in_pelvis" size="0.01" pos="0.04525 0 -0.08339"/>
+      <body name="left_hip_pitch_link" pos="0 0.064452 -0.1027">
+        <inertial pos="0.002741 0.047791 -0.02606" quat="0.954862 0.293964 0.0302556 0.030122" mass="1.35" diaginertia="0.00181517 0.00153422 0.00116212"/>
+        <joint name="left_hip_pitch_joint" pos="0 0 0" axis="0 1 0" range="-2.5307 2.8798" actuatorfrcrange="-88 88" armature="0.0103"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="left_hip_pitch_link"/>
+        <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="left_hip_pitch_link"/>
+        <body name="left_hip_roll_link" pos="0 0.052 -0.030465" quat="0.996179 0 -0.0873386 0">
+          <inertial pos="0.029812 -0.001045 -0.087934" quat="0.977808 -1.97119e-05 0.205576 -0.0403793" mass="1.52" diaginertia="0.00254986 0.00241169 0.00148755"/>
+          <joint name="left_hip_roll_joint" pos="0 0 0" axis="1 0 0" range="-0.5236 2.9671" actuatorfrcrange="-139 139" armature="0.0251"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_hip_roll_link"/>
+          <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_hip_roll_link"/>
+          <body name="left_hip_yaw_link" pos="0.025001 0 -0.12412">
+            <inertial pos="-0.057709 -0.010981 -0.15078" quat="0.600598 0.15832 0.223482 0.751181" mass="1.702" diaginertia="0.00776166 0.00717575 0.00160139"/>
+            <joint name="left_hip_yaw_joint" pos="0 0 0" axis="0 0 1" range="-2.7576 2.7576" actuatorfrcrange="-88 88" armature="0.0103"/>
+            <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_hip_yaw_link"/>
+            <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_hip_yaw_link"/>
+            <body name="left_knee_link" pos="-0.078273 0.0021489 -0.17734" quat="0.996179 0 0.0873386 0">
+              <inertial pos="0.005457 0.003964 -0.12074" quat="0.923418 -0.0327699 0.0158246 0.382067" mass="1.932" diaginertia="0.0113804 0.0112778 0.00146458"/>
+              <joint name="left_knee_joint" pos="0 0 0" axis="0 1 0" range="-0.087267 2.8798" actuatorfrcrange="-139 139" armature="0.0251"/>
+              <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_knee_link"/>
+              <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_knee_link"/>
+              <body name="left_ankle_pitch_link" pos="0 -9.4445e-05 -0.30001">
+                <inertial pos="-0.007269 0 0.011137" quat="0.603053 0.369225 0.369225 0.603053" mass="0.074" diaginertia="1.89e-05 1.40805e-05 6.9195e-06"/>
+                <joint name="left_ankle_pitch_joint" pos="0 0 0" axis="0 1 0" range="-0.87267 0.5236" actuatorfrcrange="-50 50" armature="0.003597"/>
+                <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_ankle_pitch_link"/>
+                <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_ankle_pitch_link"/>
+                <body name="left_ankle_roll_link" pos="0 0 -0.017558">
+                  <inertial pos="0.026505 0 -0.016425" quat="-0.000481092 0.728482 -0.000618967 0.685065" mass="0.608" diaginertia="0.00167218 0.0016161 0.000217621"/>
+                  <joint name="left_ankle_roll_joint" pos="0 0 0" axis="1 0 0" range="-0.2618 0.2618" actuatorfrcrange="-50 50" armature="0.003597"/>
+                  <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="left_ankle_roll_link"/>
+                  <geom name="left_foot1_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="0.1 -0.026 -0.025 0.05 -0.027 -0.025"/>
+                  <geom name="left_foot2_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.044 -0.018 -0.025 0.123 -0.018 -0.025"/>
+                  <geom name="left_foot3_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.052 -0.01 -0.025 0.13 -0.01 -0.025"/>
+                  <geom name="left_foot4_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.054 0 -0.025 0.132 0 -0.025"/>
+                  <geom name="left_foot5_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.052 0.01 -0.025 0.13 0.01 -0.025"/>
+                  <geom name="left_foot6_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.044 0.018 -0.025 0.123 0.018 -0.025"/>
+                  <geom name="left_foot7_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="0.1 0.026 -0.025 0.05 0.026 -0.025"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="pelvis_contour_link"><inertial pos="0 0 0" mass="0.001" diaginertia="1e-07 1e-07 1e-07" /></body>
+      <body name="right_hip_pitch_link" pos="0 -0.064452 -0.1027">
+        <inertial pos="0.002741 -0.047791 -0.02606" quat="0.954862 -0.293964 0.0302556 -0.030122" mass="1.35" diaginertia="0.00181517 0.00153422 0.00116212"/>
+        <joint name="right_hip_pitch_joint" pos="0 0 0" axis="0 1 0" range="-2.5307 2.8798" actuatorfrcrange="-88 88" armature="0.0103"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="right_hip_pitch_link"/>
+        <geom type="mesh" rgba="0.2 0.2 0.2 1" mesh="right_hip_pitch_link"/>
+        <body name="right_hip_roll_link" pos="0 -0.052 -0.030465" quat="0.996179 0 -0.0873386 0">
+          <inertial pos="0.029812 0.001045 -0.087934" quat="0.977808 1.97119e-05 0.205576 0.0403793" mass="1.52" diaginertia="0.00254986 0.00241169 0.00148755"/>
+          <joint name="right_hip_roll_joint" pos="0 0 0" axis="1 0 0" range="-2.9671 0.5236" actuatorfrcrange="-139 139" armature="0.0251"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_hip_roll_link"/>
+          <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_hip_roll_link"/>
+          <body name="right_hip_yaw_link" pos="0.025001 0 -0.12412">
+            <inertial pos="-0.057709 0.010981 -0.15078" quat="0.751181 0.223482 0.15832 0.600598" mass="1.702" diaginertia="0.00776166 0.00717575 0.00160139"/>
+            <joint name="right_hip_yaw_joint" pos="0 0 0" axis="0 0 1" range="-2.7576 2.7576" actuatorfrcrange="-88 88" armature="0.0103"/>
+            <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_hip_yaw_link"/>
+            <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_hip_yaw_link"/>
+            <body name="right_knee_link" pos="-0.078273 -0.0021489 -0.17734" quat="0.996179 0 0.0873386 0">
+              <inertial pos="0.005457 -0.003964 -0.12074" quat="0.923439 0.0345276 0.0116333 -0.382012" mass="1.932" diaginertia="0.011374 0.0112843 0.00146452"/>
+              <joint name="right_knee_joint" pos="0 0 0" axis="0 1 0" range="-0.087267 2.8798" actuatorfrcrange="-139 139" armature="0.0251"/>
+              <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_knee_link"/>
+              <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_knee_link"/>
+              <body name="right_ankle_pitch_link" pos="0 9.4445e-05 -0.30001">
+                <inertial pos="-0.007269 0 0.011137" quat="0.603053 0.369225 0.369225 0.603053" mass="0.074" diaginertia="1.89e-05 1.40805e-05 6.9195e-06"/>
+                <joint name="right_ankle_pitch_joint" pos="0 0 0" axis="0 1 0" range="-0.87267 0.5236" actuatorfrcrange="-50 50" armature="0.003597"/>
+                <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_ankle_pitch_link"/>
+                <geom type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_ankle_pitch_link"/>
+                <body name="right_ankle_roll_link" pos="0 0 -0.017558">
+                  <inertial pos="0.026505 0 -0.016425" quat="0.000481092 0.728482 0.000618967 0.685065" mass="0.608" diaginertia="0.00167218 0.0016161 0.000217621"/>
+                  <joint name="right_ankle_roll_joint" pos="0 0 0" axis="1 0 0" range="-0.2618 0.2618" actuatorfrcrange="-50 50" armature="0.003597"/>
+                  <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="right_ankle_roll_link"/>
+                  <geom name="right_foot1_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="0.1 -0.026 -0.025 0.05 -0.026 -0.025"/>
+                  <geom name="right_foot2_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.044 -0.018 -0.025 0.123 -0.018 -0.025"/>
+                  <geom name="right_foot3_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.052 -0.01 -0.025 0.13 -0.01 -0.025"/>
+                  <geom name="right_foot4_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.054 0 -0.025 0.132 0 -0.025"/>
+                  <geom name="right_foot5_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.052 0.01 -0.025 0.13 0.01 -0.025"/>
+                  <geom name="right_foot6_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="-0.044 0.018 -0.025 0.123 0.018 -0.025"/>
+                  <geom name="right_foot7_collision" type="capsule" size="0.01" contype="1" conaffinity="1" rgba="0.5 0.5 0.5 0" fromto="0.1 0.026 -0.025 0.05 0.026 -0.025"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="waist_yaw_link">
+        <inertial pos="0.003494 0.000233 0.018034" quat="0.289697 0.591001 -0.337795 0.672821" mass="0.214" diaginertia="0.000163531 0.000107714 0.000102205"/>
+        <joint name="waist_yaw_joint" pos="0 0 0" axis="0 0 1" range="-2.618 2.618" actuatorfrcrange="-88 88" armature="0.0103"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="waist_yaw_link"/>
+        <body name="waist_roll_link" pos="-0.0039635 0 0.044">
+          <inertial pos="0 2.3e-05 0" quat="0.5 0.5 -0.5 0.5" mass="0.086" diaginertia="8.245e-06 7.079e-06 6.339e-06"/>
+          <joint name="waist_roll_joint" pos="0 0 0" axis="1 0 0" range="-0.52 0.52" actuatorfrcrange="-50 50" armature="0.0103"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="waist_roll_link"/>
+          <body name="torso_link">
+            <inertial pos="0.00203158 0.000339683 0.184568" quat="0.999803 -6.03319e-05 0.0198256 0.00131986" mass="7.818" diaginertia="0.121847 0.109825 0.0273735"/>
+            <joint name="waist_pitch_joint" pos="0 0 0" axis="0 1 0" range="-0.52 0.52" actuatorfrcrange="-50 50" armature="0.007194"/>
+            <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="torso_link"/>
+            <geom name="torso_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="torso_link"/>
+            <geom pos="0.0039635 0 -0.044" quat="1 0 0 0" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="logo_link"/>
+            <geom pos="0.0039635 0 -0.044" quat="1 0 0 0" type="mesh" rgba="0.2 0.2 0.2 1" mesh="logo_link"/>
+            <!-- <body name="head_link" pos="0.0039635 0 -0.044">
+              <inertial pos="0.005267 0.000299 0.449869" quat="0.698214 0.0103452 0.0112083 0.715727" mass="1.036" diaginertia="0.00418528 0.00408711 0.00180579" />
+            </body> -->
+            <geom pos="0.0039635 0 -0.044" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.2 0.2 0.2 1" mesh="head_link"/>
+            <geom pos="0.0039635 0 -0.044" type="mesh" rgba="0.2 0.2 0.2 1" mesh="head_link"/>
+            <body name="head_camera_mount" pos="0.105927 0.0315 0.339">
+              <camera name="head_camera" mode="fixed" pos="0 0 0" xyaxes="0 -1 0 0.4694716 0 0.8829476" fovy="57"/>
+            </body>
+            <site name="imu_in_torso" size="0.01" pos="-0.03959 -0.00224 0.14792"/>
+            <body name="imu_in_torso" pos="-0.03959 -0.00224 0.14792"></body>
+            <body name="left_shoulder_pitch_link" pos="0.0039563 0.10022 0.24778" quat="0.990264 0.139201 1.38722e-05 -9.86868e-05">
+              <inertial pos="0 0.035892 -0.011628" quat="0.654152 0.0130458 -0.326267 0.68225" mass="0.718" diaginertia="0.000465864 0.000432842 0.000406394"/>
+              <joint name="left_shoulder_pitch_joint" pos="0 0 0" axis="0 1 0" range="-3.0892 2.6704" actuatorfrcrange="-25 25" armature="0.003597"/>
+              <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_shoulder_pitch_link"/>
+              <geom name="left_shoulder_pitch_collision" size="0.03 0.025" pos="0 0.04 -0.01" quat="0.707107 0 0.707107 0" type="cylinder" rgba="0.7 0.7 0.7 1"/>
+              <body name="left_shoulder_roll_link" pos="0 0.038 -0.013831" quat="0.990268 -0.139172 0 0">
+                <inertial pos="-0.000227 0.00727 -0.063243" quat="0.701256 -0.0196223 -0.00710317 0.712604" mass="0.643" diaginertia="0.000691311 0.000618011 0.000388977"/>
+                <joint name="left_shoulder_roll_joint" pos="0 0 0" axis="1 0 0" range="-1.5882 2.2515" actuatorfrcrange="-25 25" armature="0.003597"/>
+                <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_shoulder_roll_link"/>
+                <geom name="left_shoulder_roll_collision" size="0.03 0.015" pos="-0.004 0.006 -0.053" type="cylinder" rgba="0.7 0.7 0.7 1"/>
+                <body name="left_shoulder_yaw_link" pos="0 0.00624 -0.1032">
+                  <inertial pos="0.010773 -0.002949 -0.072009" quat="0.716879 -0.0964829 -0.0679942 0.687134" mass="0.734" diaginertia="0.00106187 0.00103217 0.000400661"/>
+                  <joint name="left_shoulder_yaw_joint" pos="0 0 0" axis="0 0 1" range="-2.618 2.618" actuatorfrcrange="-25 25" armature="0.003597"/>
+                  <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_shoulder_yaw_link"/>
+                  <geom name="left_shoulder_yaw_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_shoulder_yaw_link"/>
+                  <body name="left_elbow_link" pos="0.015783 0 -0.080518">
+                    <inertial pos="0.064956 0.004454 -0.010062" quat="0.541765 0.636132 0.388821 0.388129" mass="0.6" diaginertia="0.000443035 0.000421612 0.000259353"/>
+                    <joint name="left_elbow_joint" pos="0 0 0" axis="0 1 0" range="-1.0472 2.0944" actuatorfrcrange="-25 25" armature="0.003597"/>
+                    <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_elbow_link"/>
+                    <geom name="left_elbow_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_elbow_link"/>
+                    <body name="left_wrist_roll_link" pos="0.1 0.00188791 -0.01">
+                      <joint name="left_wrist_roll_joint" pos="0 0 0" axis="1 0 0" range="-1.97222 1.97222" actuatorfrcrange="-25 25" armature="0.003597"/>
+                      <inertial pos="0.0171394 0.000537591 4.8864e-07" quat="0.575338 0.411667 -0.574906 0.411094" mass="0.085445" diaginertia="5.48211e-05 4.96646e-05 3.57798e-05"/>
+                      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_wrist_roll_link"/>
+                      <geom name="left_wrist_roll_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_wrist_roll_link"/>
+                      <body name="left_wrist_pitch_link" pos="0.038 0 0">
+                        <inertial pos="0.0229999 -0.00111685 -0.00111658" quat="0.249998 0.661363 0.293036 0.643608" mass="0.48405" diaginertia="0.000430353 0.000429873 0.000164648"/>
+                        <joint name="left_wrist_pitch_joint" pos="0 0 0" axis="0 1 0" range="-1.61443 1.61443" actuatorfrcrange="-5 5" armature="0.00425"/>
+                        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_wrist_pitch_link"/>
+                        <geom name="left_wrist_pitch_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_wrist_pitch_link"/>
+                        <body name="left_wrist_yaw_link" pos="0.046 0 0">
+                          <inertial pos="0.0708244 0.000191745 0.00161742" quat="0.510571 0.526295 0.468078 0.493188" mass="0.084576" diaginertia="0.000646113 0.000559993 0.000147566"/>
+                          <joint name="left_wrist_yaw_joint" pos="0 0 0" axis="0 0 1" range="-1.61443 1.61443" actuatorfrcrange="-5 5" armature="0.00425"/>
+                          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="left_wrist_yaw_link"/>
+                          <geom name="left_wrist_yaw_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="left_wrist_yaw_link"/>
+                          <!--
+                            Modded Dex1-1 gripper with stock UMI silicone fingers.
+                            Dex1-1 chassis sliders were widened so the parallel
+                            jaw stroke is 12 cm (vs stock 9 cm) — that 1.5 cm
+                            per side widening is exposed by the prismatic joint
+                            range 0–0.060 m. UMI assets are MIT licensed
+                            (Columbia AIRL 2023).
+                            Geom rotations apply only to visuals — the
+                            kinematic mount/rail/finger frames are unchanged so
+                            existing joint names, axes, and offsets carry over.
+                          -->
+                          <body name="left_gripper_mount" pos="0.0415 0 0">
+                            <!-- Dex1-1 base mesh: rotate R_z(-π/2) so its forward
+                                 (Y_dex) aligns with mount +X; closing (X_dex)
+                                 aligns with mount -Y; vertical preserved. -->
+                            <geom name="left_gripper_mount_geom" type="mesh" mesh="dex1_base_link" pos="0.03 0 0" quat="0.7071068 0 0 -0.7071068" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1 0.005 0.0001" group="1"/>
+                            <geom name="left_wrist_gripper_spacer" type="cylinder" size="0.025 0.015" pos="0.015 0 0" quat="0.7071068 0 0.7071068 0" rgba="0 0 0 1" contype="0" conaffinity="0" density="0" group="1"/>
+                            <inertial pos="0.0593 0 0.0081" mass="0.316" diaginertia="6.8944e-05 4.9533e-05 3.4443e-05"/>
+                            <body name="gripper_rail_L" pos="0.100 0.003 0.0" quat="0.707107 0 0.707107 0">
+                              <!-- Massless intermediate frame. Chassis mesh on parent covers it visually.
+                                   Kept to satisfy robot_self_mask.py link-name lookups. -->
+                              <inertial pos="0 0 0" mass="1e-4" diaginertia="1e-7 1e-7 1e-7"/>
+                              <body name="gripper_1_L" pos="0 0 0">
+                                <joint name="gripper_prismatic_1_L" type="slide" axis="0 -1 0" range="0 0.065" damping="5.0" actuatorfrclimited="true" actuatorfrcrange="-120 120"/>
+                                <inertial pos="0 -0.020 0.06" mass="0.117" diaginertia="1.5e-04 1.4e-04 6.0e-05"/>
+                                <!-- Slider piston: pad sits at body Y=-0.004 (outer tip); mesh bulk extends INWARD
+                                     to Y=+0.076 toward the closing center / chassis interior. -->
+                                <geom name="gripper_1_L_slider_geom" type="mesh" mesh="dex1_slider" pos="-0.012 0 0" quat="0.5 0.5 -0.5 -0.5" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1 0.005 0.0001" group="1"/>
+                                <geom name="gripper_1_L_pad_geom" type="mesh" mesh="umi_finger_L" pos="-0.008 -0.0 0.007" quat="0 0.7071068 -0.7071068 0" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1.0 0.05 0.001" group="1"/>
+                              </body>
+                              <body name="gripper_2_L" pos="0 0 0">
+                                <joint name="gripper_prismatic_2_L" type="slide" axis="0 1 0" range="0 0.065" damping="5.0" actuatorfrclimited="true" actuatorfrcrange="-120 120"/>
+                                <inertial pos="0 0.020 0.06" mass="0.117" diaginertia="1.5e-04 1.4e-04 6.0e-05"/>
+                                <!-- Slider piston (other jaw): pad at body Y=+0.004 (outer tip); bulk extends INWARD to Y=-0.076. -->
+                                <geom name="gripper_2_L_slider_geom" type="mesh" mesh="dex1_slider" pos="0.012 0 0" quat="0.5 0.5 0.5 0.5" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1 0.005 0.0001" group="1"/>
+                                <geom name="gripper_2_L_pad_geom" type="mesh" mesh="umi_finger_R" pos="0.008 0.0 0.007" quat="0 0.7071068 0.7071068 0" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1.0 0.05 0.001" group="1"/>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+            <body name="right_shoulder_pitch_link" pos="0.0039563 -0.10021 0.24778" quat="0.990264 -0.139201 1.38722e-05 9.86868e-05">
+              <inertial pos="0 -0.035892 -0.011628" quat="0.68225 -0.326267 0.0130458 0.654152" mass="0.718" diaginertia="0.000465864 0.000432842 0.000406394"/>
+              <joint name="right_shoulder_pitch_joint" pos="0 0 0" axis="0 1 0" range="-3.0892 2.6704" actuatorfrcrange="-25 25" armature="0.003597"/>
+              <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_shoulder_pitch_link"/>
+              <geom name="right_shoulder_pitch_collision" size="0.03 0.025" pos="0 -0.04 -0.01" quat="0.707107 0 0.707107 0" type="cylinder" rgba="0.7 0.7 0.7 1"/>
+              <body name="right_shoulder_roll_link" pos="0 -0.038 -0.013831" quat="0.990268 0.139172 0 0">
+                <inertial pos="-0.000227 -0.00727 -0.063243" quat="0.712604 -0.00710317 -0.0196223 0.701256" mass="0.643" diaginertia="0.000691311 0.000618011 0.000388977"/>
+                <joint name="right_shoulder_roll_joint" pos="0 0 0" axis="1 0 0" range="-2.2515 1.5882" actuatorfrcrange="-25 25" armature="0.003597"/>
+                <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_shoulder_roll_link"/>
+                <geom name="right_shoulder_roll_collision" size="0.03 0.015" pos="-0.004 -0.006 -0.053" type="cylinder" rgba="0.7 0.7 0.7 1"/>
+                <body name="right_shoulder_yaw_link" pos="0 -0.00624 -0.1032">
+                  <inertial pos="0.010773 0.002949 -0.072009" quat="0.687134 -0.0679942 -0.0964829 0.716879" mass="0.734" diaginertia="0.00106187 0.00103217 0.000400661"/>
+                  <joint name="right_shoulder_yaw_joint" pos="0 0 0" axis="0 0 1" range="-2.618 2.618" actuatorfrcrange="-25 25" armature="0.003597"/>
+                  <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_shoulder_yaw_link"/>
+                  <geom name="right_shoulder_yaw_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_shoulder_yaw_link"/>
+                  <body name="right_elbow_link" pos="0.015783 0 -0.080518">
+                    <inertial pos="0.064956 -0.004454 -0.010062" quat="0.388129 0.388821 0.636132 0.541765" mass="0.6" diaginertia="0.000443035 0.000421612 0.000259353"/>
+                    <joint name="right_elbow_joint" pos="0 0 0" axis="0 1 0" range="-1.0472 2.0944" actuatorfrcrange="-25 25" armature="0.003597"/>
+                    <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_elbow_link"/>
+                    <geom name="right_elbow_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_elbow_link"/>
+                    <body name="right_wrist_roll_link" pos="0.1 -0.00188791 -0.01">
+                      <joint name="right_wrist_roll_joint" pos="0 0 0" axis="1 0 0" range="-1.97222 1.97222" actuatorfrcrange="-25 25" armature="0.003597"/>
+                      <inertial pos="0.0171394 -0.000537591 4.8864e-07" quat="0.411667 0.575338 -0.411094 0.574906" mass="0.085445" diaginertia="5.48211e-05 4.96646e-05 3.57798e-05"/>
+                      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_wrist_roll_link"/>
+                      <geom name="right_wrist_roll_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_wrist_roll_link"/>
+                      <body name="right_wrist_pitch_link" pos="0.038 0 0">
+                        <inertial pos="0.0229999 0.00111685 -0.00111658" quat="0.643608 0.293036 0.661363 0.249998" mass="0.48405" diaginertia="0.000430353 0.000429873 0.000164648"/>
+                        <joint name="right_wrist_pitch_joint" pos="0 0 0" axis="0 1 0" range="-1.61443 1.61443" actuatorfrcrange="-25 25" armature="0.00425"/>
+                        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_wrist_pitch_link"/>
+                        <geom name="right_wrist_pitch_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_wrist_pitch_link"/>
+                        <body name="right_wrist_yaw_link" pos="0.046 0 0">
+                          <inertial pos="0.0708244 -0.000191745 0.00161742" quat="0.493188 0.468078 0.526295 0.510571" mass="0.084576" diaginertia="0.000646113 0.000559993 0.000147566"/>
+                          <joint name="right_wrist_yaw_joint" pos="0 0 0" axis="0 0 1" range="-1.61443 1.61443" actuatorfrcrange="-25 25" armature="0.00425"/>
+                          <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.7 0.7 0.7 1" mesh="right_wrist_yaw_link"/>
+                          <geom name="right_wrist_yaw_collision" type="mesh" rgba="0.7 0.7 0.7 1" mesh="right_wrist_yaw_link"/>
+                          <body name="right_gripper_mount" pos="0.0415 0 0">
+                            <geom name="right_gripper_mount_geom" type="mesh" mesh="dex1_base_link" pos="0.03 0 0" quat="0.7071068 0 0 -0.7071068" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1 0.005 0.0001" group="1"/>
+                            <geom name="right_wrist_gripper_spacer" type="cylinder" size="0.025 0.015" pos="0.015 0 0" quat="0.7071068 0 0.7071068 0" rgba="0 0 0 1" contype="0" conaffinity="0" density="0" group="1"/>
+                            <inertial pos="0.0593 0 0.0081" mass="0.316" diaginertia="6.8944e-05 4.9533e-05 3.4443e-05"/>
+                            <body name="gripper_rail_R" pos="0.100 -0.003 0.0" quat="0.707107 0 0.707107 0">
+                              <inertial pos="0 0 0" mass="1e-4" diaginertia="1e-7 1e-7 1e-7"/>
+                              <body name="gripper_1_R" pos="0 0 0">
+                                <joint name="gripper_prismatic_1_R" type="slide" axis="0 -1 0" range="0 0.065" damping="5.0" actuatorfrclimited="true" actuatorfrcrange="-120 120"/>
+                                <inertial pos="0 -0.020 0.06" mass="0.117" diaginertia="1.5e-04 1.4e-04 6.0e-05"/>
+                                <geom name="gripper_1_R_slider_geom" type="mesh" mesh="dex1_slider" pos="-0.012 0 0" quat="0.5 0.5 -0.5 -0.5" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1 0.005 0.0001" group="1"/>
+                                <geom name="gripper_1_R_pad_geom" type="mesh" mesh="umi_finger_L" pos="-0.008 -0.0 -0.007" quat="0 0.7071068 -0.7071068 0" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1.0 0.05 0.001" group="1"/>
+                              </body>
+                              <body name="gripper_2_R" pos="0 0 0">
+                                <joint name="gripper_prismatic_2_R" type="slide" axis="0 1 0" range="0 0.065" damping="5.0" actuatorfrclimited="true" actuatorfrcrange="-120 120"/>
+                                <inertial pos="0 0.020 0.06" mass="0.117" diaginertia="1.5e-04 1.4e-04 6.0e-05"/>
+                                <geom name="gripper_2_R_slider_geom" type="mesh" mesh="dex1_slider" pos="0.012 0 0" quat="0.5 0.5 0.5 0.5" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1 0.005 0.0001" group="1"/>
+                                <geom name="gripper_2_R_pad_geom" type="mesh" mesh="umi_finger_R" pos="0.008 0.0 0.007" quat="0 0.7071068 0.7071068 0" rgba="0.05 0.05 0.05 1" contype="1" conaffinity="1" condim="6" friction="1.0 0.05 0.001" group="1"/>
+                              </body>
+                            </body>
+                          </body>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <contact>
+    <!-- Prevent collision between the two jaws of each gripper. With pads at
+         body Y=0 and sliders crossing the centerline, geoms on opposite jaws
+         overlap and would generate huge contact forces that lock the joints. -->
+    <exclude body1="gripper_1_L" body2="gripper_2_L"/>
+    <exclude body1="gripper_1_R" body2="gripper_2_R"/>
+    <!-- table-vs-object and gripper-vs-object pairs are injected at runtime
+         by deploy/sim/graspnet_scene.py (since object geom names depend on
+         which graspnet ids are loaded). -->
+    <!-- bins disabled
+    <pair geom1="bin_bottom" geom2="block_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="bin_bottom" geom2="block1_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    -->
+    <!-- left_table disabled
+    <pair geom1="left_table_top" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    -->
+    <!-- bins disabled
+    <pair geom1="bin_bottom" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="bin_wall_front" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="bin_wall_back" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="bin_wall_left" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="bin_wall_right" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="yellow_bin_bottom" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="yellow_bin_wall_front" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="yellow_bin_wall_back" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="yellow_bin_wall_left" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="yellow_bin_wall_right" geom2="table_box_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    -->
+
+    <!-- gripper_*_pad_geom × graspnet collision geoms are injected at runtime. -->
+    <!-- right_shelf, shelf_blocks, table_box disabled
+    <pair geom1="right_shelf_upper" geom2="shelf_block_upper_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="right_shelf_lower" geom2="shelf_block_lower_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="right_shelf_upper" geom2="shelf_block_lower_geom" condim="3"
+      margin="0.003" gap="0.0" solref="0.015 2" solimp="0.90 0.95 0.001"
+      friction="2.5 2.5 0 0 0"/>
+    <pair geom1="gripper_1_L_pad_geom" geom2="shelf_block_upper_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_2_L_pad_geom" geom2="shelf_block_upper_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_1_R_pad_geom" geom2="shelf_block_upper_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_2_R_pad_geom" geom2="shelf_block_upper_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_1_L_pad_geom" geom2="shelf_block_lower_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_2_L_pad_geom" geom2="shelf_block_lower_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_1_R_pad_geom" geom2="shelf_block_lower_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_2_R_pad_geom" geom2="shelf_block_lower_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+        <pair geom1="left_shoulder_pitch_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="left_shoulder_roll_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="left_shoulder_yaw_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="left_elbow_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="left_wrist_roll_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="left_wrist_pitch_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="left_wrist_yaw_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="right_shoulder_pitch_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="right_shoulder_roll_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="right_shoulder_yaw_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="right_elbow_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="right_wrist_roll_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="right_wrist_pitch_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="right_wrist_yaw_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="torso_collision" geom2="table_box_geom" condim="6" margin="0.008" gap="0.001" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+<pair geom1="gripper_1_L_pad_geom" geom2="table_box_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_2_L_pad_geom" geom2="table_box_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_1_R_pad_geom" geom2="table_box_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    <pair geom1="gripper_2_R_pad_geom" geom2="table_box_geom" condim="6" margin="0" gap="0" solref="0.002 1" solimp="0.985 0.999 0.0003" friction="20 20 0.5 0.1 0.1"/>
+    -->
+  </contact>
+
+  <actuator>
+    <!-- Hip pitch/yaw, waist_yaw: 7520_14 motor  kp=40.18  kd=2.56 -->
+    <position name="left_hip_pitch_joint"  joint="left_hip_pitch_joint"  kp="40.18" kv="2.56" ctrllimited="false"/>
+    <position name="left_hip_yaw_joint"    joint="left_hip_yaw_joint"    kp="40.18" kv="2.56" ctrllimited="false"/>
+    <!-- Hip roll, knees: 7520_22 motor  kp=99.10  kd=6.31 -->
+    <position name="left_hip_roll_joint"   joint="left_hip_roll_joint"   kp="99.10" kv="6.31" ctrllimited="false"/>
+    <position name="left_knee_joint"       joint="left_knee_joint"       kp="99.10" kv="6.31" ctrllimited="false"/>
+    <!-- Ankle pitch/roll: dual 5020  kp=28.50  kd=1.81 -->
+    <position name="left_ankle_pitch_joint" joint="left_ankle_pitch_joint" kp="28.50" kv="1.81" ctrllimited="false"/>
+    <position name="left_ankle_roll_joint"  joint="left_ankle_roll_joint"  kp="28.50" kv="1.81" ctrllimited="false"/>
+    <position name="right_hip_pitch_joint" joint="right_hip_pitch_joint" kp="40.18" kv="2.56" ctrllimited="false"/>
+    <position name="right_hip_roll_joint"  joint="right_hip_roll_joint"  kp="99.10" kv="6.31" ctrllimited="false"/>
+    <position name="right_hip_yaw_joint"   joint="right_hip_yaw_joint"   kp="40.18" kv="2.56" ctrllimited="false"/>
+    <position name="right_knee_joint"      joint="right_knee_joint"      kp="99.10" kv="6.31" ctrllimited="false"/>
+    <position name="right_ankle_pitch_joint" joint="right_ankle_pitch_joint" kp="28.50" kv="1.81" ctrllimited="false"/>
+    <position name="right_ankle_roll_joint"  joint="right_ankle_roll_joint"  kp="28.50" kv="1.81" ctrllimited="false"/>
+    <!-- Waist yaw: 7520_14  kp=40.18  kd=2.56 -->
+    <position name="waist_yaw_joint"   joint="waist_yaw_joint"   kp="40.18" kv="2.56" ctrllimited="false"/>
+    <!-- Waist roll/pitch: dual 5020  kp=28.50  kd=1.81 -->
+    <position name="waist_roll_joint"  joint="waist_roll_joint"  kp="28.50" kv="1.81" ctrllimited="false"/>
+    <position name="waist_pitch_joint" joint="waist_pitch_joint" kp="28.50" kv="1.81" ctrllimited="false"/>
+    <!-- Shoulder pitch/roll/yaw, elbow, wrist_roll: 5020  kp=14.25  kd=0.91 -->
+    <position name="left_shoulder_pitch_joint" joint="left_shoulder_pitch_joint" kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="left_shoulder_roll_joint"  joint="left_shoulder_roll_joint"  kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="left_shoulder_yaw_joint"   joint="left_shoulder_yaw_joint"   kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="left_elbow_joint"          joint="left_elbow_joint"          kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="left_wrist_roll_joint"     joint="left_wrist_roll_joint"     kp="14.25" kv="0.91" ctrllimited="false"/>
+    <!-- Wrist pitch/yaw: 4010  kp=16.78  kd=1.07 -->
+    <position name="left_wrist_pitch_joint"    joint="left_wrist_pitch_joint"    kp="16.78" kv="1.07" ctrllimited="false"/>
+    <position name="left_wrist_yaw_joint"      joint="left_wrist_yaw_joint"      kp="16.78" kv="1.07" ctrllimited="false"/>
+    <position name="right_shoulder_pitch_joint" joint="right_shoulder_pitch_joint" kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="right_shoulder_roll_joint"  joint="right_shoulder_roll_joint"  kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="right_shoulder_yaw_joint"   joint="right_shoulder_yaw_joint"   kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="right_elbow_joint"          joint="right_elbow_joint"          kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="right_wrist_roll_joint"     joint="right_wrist_roll_joint"     kp="14.25" kv="0.91" ctrllimited="false"/>
+    <position name="right_wrist_pitch_joint"    joint="right_wrist_pitch_joint"    kp="16.78" kv="1.07" ctrllimited="false"/>
+    <position name="right_wrist_yaw_joint"      joint="right_wrist_yaw_joint"      kp="16.78" kv="1.07" ctrllimited="false"/>
+    <!-- Gripper prismatic joints: remain torque-controlled -->
+    <motor name="gripper_prismatic_1_L" joint="gripper_prismatic_1_L" ctrlrange="-120 120" ctrllimited="true"/>
+    <motor name="gripper_prismatic_1_R" joint="gripper_prismatic_1_R" ctrlrange="-120 120" ctrllimited="true"/>
+  </actuator>
+
+  <equality>
+    <joint joint1="gripper_prismatic_1_L" joint2="gripper_prismatic_2_L" polycoef="0 1 0 0 0"/>
+    <joint joint1="gripper_prismatic_1_R" joint2="gripper_prismatic_2_R" polycoef="0 1 0 0 0"/>
+  </equality>
+
+  <sensor>
+    <framequat name='orientation' objtype='site' noise='0.001' objname='imu_in_pelvis'/>
+    <framepos name='position' objtype='site' noise='0.001' objname='imu_in_pelvis'/>
+    <gyro name='angular-velocity' cutoff='34.9' noise='0.005' site='imu_in_pelvis'/>
+  </sensor>
+
+  <!-- setup scene -->
+  <statistic center="1.0 0.7 1.0" extent="0.8"/>
+  <visual>
+    <headlight diffuse="0.9 0.9 0.9" ambient="0.6 0.6 0.6" specular="0.2 0.2 0.2"/>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global azimuth="-140" elevation="-24"/>
+  </visual>
+
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1="1 1 1" rgb2="1 1 1" width="800" height="800"/>
+
+    <!-- Home-style flooring (wood-grain placeholder; swap floor/wood.png to retexture) -->
+    <texture type="2d" name="floor_tex" file="floor/wood.png"/>
+    <material name="floor_mat" texture="floor_tex" texrepeat="3 3" reflectance="0.1"/>
+    <!-- Wall paint texture (ambientcg PaintedPlaster017, CC0). Tile ≈ 1.7 m. -->
+    <texture type="2d" name="wall_tex" file="floor/wall.png"/>
+    <material name="wall_mat" texture="wall_tex" texrepeat="3 1.8" reflectance="0.05"/>
+    <!-- Trash can mesh + diffuse (polyhaven metal_trash_can, CC0). The mesh
+         is preprocessed to Z-up, bottom-on-origin, centered on xy. -->
+    <texture type="2d" name="trash_can_tex" file="trash_can/trash_can.png"/>
+    <material name="trash_can_mat" texture="trash_can_tex" specular="0.6" shininess="0.4"/>
+    <mesh name="trash_can_mesh" file="trash_can/trash_can.obj" scale="0.8 0.8 0.8"/>
+    <!-- 20 convex pieces (COACD) for hollow-bin collision; scale matches the visual mesh. -->
+    <mesh name="trash_can_col_0" file="trash_can/trash_can_col_0.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_1" file="trash_can/trash_can_col_1.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_2" file="trash_can/trash_can_col_2.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_3" file="trash_can/trash_can_col_3.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_4" file="trash_can/trash_can_col_4.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_5" file="trash_can/trash_can_col_5.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_6" file="trash_can/trash_can_col_6.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_7" file="trash_can/trash_can_col_7.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_8" file="trash_can/trash_can_col_8.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_9" file="trash_can/trash_can_col_9.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_10" file="trash_can/trash_can_col_10.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_11" file="trash_can/trash_can_col_11.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_12" file="trash_can/trash_can_col_12.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_13" file="trash_can/trash_can_col_13.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_14" file="trash_can/trash_can_col_14.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_15" file="trash_can/trash_can_col_15.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_16" file="trash_can/trash_can_col_16.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_17" file="trash_can/trash_can_col_17.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_18" file="trash_can/trash_can_col_18.obj" scale="0.8 0.8 0.8"/>
+    <mesh name="trash_can_col_19" file="trash_can/trash_can_col_19.obj" scale="0.8 0.8 0.8"/>
+    <!-- Legacy plastic bin material kept for reference (ambientcg Plastic008). -->
+    <texture type="2d" name="bin_tex" file="floor/bin_plastic.png"/>
+    <material name="bin_mat" texture="bin_tex" rgba="0.4 0.9 0.5 1" texrepeat="3 3" specular="0.25" shininess="0.15"/>
+
+    <!-- Lab table (textured mesh + box colliders from SIMPLE lab_table) -->
+    <texture type="2d" name="lab_table_tex" file="lab_table/table.png"/>
+    <material name="lab_table_mat" texture="lab_table_tex" specular="0.5" shininess="0.25"/>
+    <mesh name="lab_table_mesh" file="lab_table/lab_table.obj"/>
+  </asset>
+
+  <worldbody>
+    <geom name="floor" size="0 0 0.01" type="plane" material="floor_mat" contype="1" conaffinity="0" priority="1"
+      friction="1.6" condim="3"/>
+    <!-- 4 walls box the scene at ±3 m from world origin → 6 × 6 × 3 m
+         enclosure. Walls 6 m long × 3 m tall × 0.1 m thick. -->
+    <geom name="left_wall"  type="box" pos="0  3.0 1.5" size="3.0 0.05 1.5"
+      material="wall_mat" contype="1" conaffinity="0" condim="3"/>
+    <geom name="right_wall" type="box" pos="0 -3.0 1.5" size="3.0 0.05 1.5"
+      material="wall_mat" contype="1" conaffinity="0" condim="3"/>
+    <geom name="front_wall" type="box" pos=" 3.0 0 1.5" size="0.05 3.0 1.5"
+      material="wall_mat" contype="1" conaffinity="0" condim="3"/>
+    <geom name="back_wall"  type="box" pos="-3.0 0 1.5" size="0.05 3.0 1.5"
+      material="wall_mat" contype="1" conaffinity="0" condim="3"/>
+
+    <!-- bins disabled
+    <body name="bin" pos="-1.0 -0.6 0.0">
+      <geom name="bin_bottom" type="box" size="0.24 0.24 0.01" pos="0 0 0.01"
+        rgba="0.18 0.65 0.25 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+      <geom name="bin_wall_front" type="box" size="0.01 0.24 0.22" pos="0.23 0 0.22"
+        rgba="0.18 0.65 0.25 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+      <geom name="bin_wall_back" type="box" size="0.01 0.24 0.22" pos="-0.23 0 0.22"
+        rgba="0.18 0.65 0.25 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+      <geom name="bin_wall_left" type="box" size="0.24 0.01 0.22" pos="0 0.23 0.22"
+        rgba="0.18 0.65 0.25 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+      <geom name="bin_wall_right" type="box" size="0.24 0.01 0.22" pos="0 -0.23 0.22"
+        rgba="0.18 0.65 0.25 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+    </body>
+
+    <body name="yellow_bin" pos="-1.0 0.0 0.0">
+      <geom name="yellow_bin_bottom" type="box" size="0.24 0.24 0.01" pos="0 0 0.01"
+        rgba="1.0 0.85 0.0 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+      <geom name="yellow_bin_wall_front" type="box" size="0.01 0.24 0.22" pos="0.23 0 0.22"
+        rgba="1.0 0.85 0.0 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+      <geom name="yellow_bin_wall_back" type="box" size="0.01 0.24 0.22" pos="-0.23 0 0.22"
+        rgba="1.0 0.85 0.0 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+      <geom name="yellow_bin_wall_left" type="box" size="0.24 0.01 0.22" pos="0 0.23 0.22"
+        rgba="1.0 0.85 0.0 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+      <geom name="yellow_bin_wall_right" type="box" size="0.24 0.01 0.22" pos="0 -0.23 0.22"
+        rgba="1.0 0.85 0.0 1" contype="1" conaffinity="1" condim="6" friction="1.2 0.1 0.01"/>
+    </body>
+    -->
+
+    <!-- Lab table: textured visual mesh + 8 box colliders (from SIMPLE lab_table).
+         pos x=0.8 puts the table directly in front of the robot (robot faces +X).
+         Body z=0.066 keeps the table top at z=0.75 (lab_table own-frame top=0.684).
+         euler -90° about Z puts the table's long edge facing the robot. -->
+    <body name="table" pos="1.80 0.00 0.066" euler="0 0 -1.57079632679">
+      <geom name="table_visual" type="mesh" mesh="lab_table_mesh" material="lab_table_mat"
+        contype="0" conaffinity="0" group="1"/>
+      <geom name="table_col_0" type="box"
+        pos="0.4843686625509804 -0.000730093650563612 0.3342451038217457"
+        size="0.04263440320922718 0.04285815157647449 0.2785983345803944"
+        quat="0.005135747294760671 0.9998119259901994 0.0186999519307263 0.00022032993656703975"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="table_col_1" type="box"
+        pos="0 0.003 0.658"
+        size="0.587 0.368 0.026"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="table_col_2" type="box"
+        pos="-0.00954106500000005 0.0029612799999999993 0.62735063"
+        size="0.014453629999999995 0.05161405327501812 0.43084086355897366"
+        quat="9.14067532065674e-05 -0.7071067752785329 9.140675320652676e-05 0.7071067752785327"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="table_col_3" type="box"
+        pos="-0.490715503853547 0.002950882518163021 0.02401571"
+        size="0.0313436 0.039379695186117364 0.26608269445757937"
+        quat="0.4999840367343198 -0.5000159627560445 0.49998403673431996 0.5000159627560447"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="table_col_4" type="box"
+        pos="-0.48929601084175645 0.002471445296000595 0.333870825"
+        size="0.04208595265213852 0.04300403156756598 0.278456965"
+        quat="0.0 -0.9999450792382256 0.010480386789563123 0.0"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="table_col_5" type="box"
+        pos="0.4862727667260499 0.003058549031851817 0.024393834739060927"
+        size="0.03166195583702207 0.03920107069552364 0.2658917817754224"
+        quat="0.5006412500091809 0.5005636633450814 0.49929226103709484 -0.49950134714158967"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="table_col_6" type="box"
+        pos="0.48068282999999995 -0.001122674999999979 0.627093285"
+        size="0.014710975000000015 0.05939634999999996 0.24522559500000002"
+        quat="0.4999999999999999 -0.4999999999999998 -0.5000000000000001 -0.4999999999999997"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="table_col_7" type="box"
+        pos="-0.49178033000000004 0.00173824500000001 0.627093285"
+        size="0.014710975000000015 0.05140170000000002 0.243484215"
+        quat="0.4999999999999999 -0.4999999999999998 -0.5000000000000001 -0.4999999999999997"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+    </body>
+
+    <!-- Second lab_table on the robot's LEFT side. Yaw 180° puts the long
+         axis along world X (table sits broadside to robot's view). Position
+         (-0.20, 1.10) is shifted back (-X) and outward (+Y) from the robot.
+         The textured block (id 000) is injected onto this table at runtime. -->
+    <body name="left_table" pos="-0.20 20.00 0.066" euler="0 0 3.14159265358">
+      <geom name="left_table_visual" type="mesh" mesh="lab_table_mesh" material="lab_table_mat"
+        contype="0" conaffinity="0" group="1"/>
+      <geom name="left_table_col_0" type="box"
+        pos="0.4843686625509804 -0.000730093650563612 0.3342451038217457"
+        size="0.04263440320922718 0.04285815157647449 0.2785983345803944"
+        quat="0.005135747294760671 0.9998119259901994 0.0186999519307263 0.00022032993656703975"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="left_table_col_1" type="box"
+        pos="0 0.003 0.658"
+        size="0.587 0.368 0.026"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="left_table_col_2" type="box"
+        pos="-0.00954106500000005 0.0029612799999999993 0.62735063"
+        size="0.014453629999999995 0.05161405327501812 0.43084086355897366"
+        quat="9.14067532065674e-05 -0.7071067752785329 9.140675320652676e-05 0.7071067752785327"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="left_table_col_3" type="box"
+        pos="-0.490715503853547 0.002950882518163021 0.02401571"
+        size="0.0313436 0.039379695186117364 0.26608269445757937"
+        quat="0.4999840367343198 -0.5000159627560445 0.49998403673431996 0.5000159627560447"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="left_table_col_4" type="box"
+        pos="-0.48929601084175645 0.002471445296000595 0.333870825"
+        size="0.04208595265213852 0.04300403156756598 0.278456965"
+        quat="0.0 -0.9999450792382256 0.010480386789563123 0.0"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="left_table_col_5" type="box"
+        pos="0.4862727667260499 0.003058549031851817 0.024393834739060927"
+        size="0.03166195583702207 0.03920107069552364 0.2658917817754224"
+        quat="0.5006412500091809 0.5005636633450814 0.49929226103709484 -0.49950134714158967"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="left_table_col_6" type="box"
+        pos="0.48068282999999995 -0.001122674999999979 0.627093285"
+        size="0.014710975000000015 0.05939634999999996 0.24522559500000002"
+        quat="0.4999999999999999 -0.4999999999999998 -0.5000000000000001 -0.4999999999999997"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+      <geom name="left_table_col_7" type="box"
+        pos="-0.49178033000000004 0.00173824500000001 0.627093285"
+        size="0.014710975000000015 0.05140170000000002 0.243484215"
+        quat="0.4999999999999999 -0.4999999999999998 -0.5000000000000001 -0.4999999999999997"
+        group="3" condim="6" friction="2.5 0.2 0.02"/>
+    </body>
+
+    <!-- legacy left_table (primitive) disabled
+    <body name="left_table" pos="-0.10 1.00 0.36" euler="0 0 1.57079632679">
+      <geom name="left_table_top" type="box" size="0.30 0.45 0.03" pos="0 0 0.36"
+        rgba="0.52 0.35 0.22 1" friction="2.5 0.2 0.02"/>
+      <geom name="left_table_leg_fl" type="box" size="0.03 0.03 0.36" pos="0.24 0.39 0"
+        rgba="0.40 0.26 0.16 1"/>
+      <geom name="left_table_leg_fr" type="box" size="0.03 0.03 0.36" pos="0.24 -0.39 0"
+        rgba="0.40 0.26 0.16 1"/>
+      <geom name="left_table_leg_rl" type="box" size="0.03 0.03 0.36" pos="-0.24 0.39 0"
+        rgba="0.40 0.26 0.16 1"/>
+      <geom name="left_table_leg_rr" type="box" size="0.03 0.03 0.36" pos="-0.24 -0.39 0"
+        rgba="0.40 0.26 0.16 1"/>
+    </body>
+    -->
+
+    <!-- right_shelf (front shelf) disabled
+    <body name="right_shelf" pos="1.30 0.00 0" euler="0 0 1.57079632679">
+      <geom name="right_shelf_upper" type="box" size="0.35 0.23 0.02" pos="0 0 0.94"
+        rgba="0.52 0.35 0.22 1" friction="2.5 0.2 0.02"/>
+      <geom name="right_shelf_lower" type="box" size="0.35 0.23 0.02" pos="0 0 0.54"
+        rgba="0.52 0.35 0.22 1" friction="2.5 0.2 0.02"/>
+      <geom name="right_shelf_leg_fl" type="box" size="0.03 0.03 0.48" pos="0.32 0.20 0.48"
+        rgba="0.40 0.26 0.16 1"/>
+      <geom name="right_shelf_leg_fr" type="box" size="0.03 0.03 0.48" pos="0.32 -0.20 0.48"
+        rgba="0.40 0.26 0.16 1"/>
+      <geom name="right_shelf_leg_rl" type="box" size="0.03 0.03 0.48" pos="-0.32 0.20 0.48"
+        rgba="0.40 0.26 0.16 1"/>
+      <geom name="right_shelf_leg_rr" type="box" size="0.03 0.03 0.48" pos="-0.32 -0.20 0.48"
+        rgba="0.40 0.26 0.16 1"/>
+    </body>
+    -->
+
+    <!-- Trash can on the floor, 1 m to the robot's right (-Y).
+         Visual = textured mesh (polyhaven metal_trash_can, ~0.55 × 0.55 ×
+         0.91 m). Collision = 5 hidden box geoms approximating the cylinder
+         body so objects dropped in stay inside. -->
+    <body name="bin" pos="0.50 -1.00 0.00">
+      <geom name="bin_visual" type="mesh" mesh="trash_can_mesh" material="trash_can_mat"
+        contype="0" conaffinity="0" group="1"/>
+      <geom name="bin_col_0"  type="mesh" mesh="trash_can_col_0"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_1"  type="mesh" mesh="trash_can_col_1"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_2"  type="mesh" mesh="trash_can_col_2"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_3"  type="mesh" mesh="trash_can_col_3"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_4"  type="mesh" mesh="trash_can_col_4"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_5"  type="mesh" mesh="trash_can_col_5"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_6"  type="mesh" mesh="trash_can_col_6"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_7"  type="mesh" mesh="trash_can_col_7"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_8"  type="mesh" mesh="trash_can_col_8"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_9"  type="mesh" mesh="trash_can_col_9"  rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_10" type="mesh" mesh="trash_can_col_10" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_11" type="mesh" mesh="trash_can_col_11" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_12" type="mesh" mesh="trash_can_col_12" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_13" type="mesh" mesh="trash_can_col_13" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_14" type="mesh" mesh="trash_can_col_14" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_15" type="mesh" mesh="trash_can_col_15" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_16" type="mesh" mesh="trash_can_col_16" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_17" type="mesh" mesh="trash_can_col_17" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_18" type="mesh" mesh="trash_can_col_18" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+      <geom name="bin_col_19" type="mesh" mesh="trash_can_col_19" rgba="0.4 0.4 0.4 1" friction="2.5 0.2 0.02" condim="6" group="3"/>
+    </body>
+
+    <!-- Manipulation objects are injected at runtime by deploy/sim/graspnet_scene.py
+         (selectable id list or random pool) — no block/block1 bodies baked here. -->
+
+    <!-- shelf_blocks and table_box (purple block) disabled
+    <body name="shelf_block_upper" pos="1.30 0.00 1.05">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.1" diaginertia="3.5416666666666666e-04 3.5416666666666666e-04 4.1666666666666664e-05"/>
+      <geom name="shelf_block_upper_geom" type="box" size="0.020 0.020 0.1" rgba="0.95 0.1 0.7 1" condim="6" contype="1" conaffinity="1" friction="20.0 0.2 0.02"/>
+    </body>
+
+    <body name="shelf_block_lower" pos="1.10 0.00 0.75">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.1" diaginertia="3.5416666666666666e-04 3.5416666666666666e-04 4.1666666666666664e-05"/>
+      <geom name="shelf_block_lower_geom" type="box" size="0.020 0.020 0.1" rgba="0.05 0.25 0.95 1" condim="6" contype="1" conaffinity="1" friction="20.0 0.2 0.02"/>
+    </body>
+
+    <body name="table_box" pos="-0.10 0.80 0.87">
+      <freejoint/>
+      <inertial pos="0 0 0" mass="0.2" diaginertia="0.0013333333333333335 0.0013333333333333335 0.0013333333333333335"/>
+      <geom name="table_box_geom" type="box" size="0.1 0.1 0.1"
+        contype="4" conaffinity="3" condim="6"
+        rgba="0.55 0.22 0.72 1" friction="6.0 0.2 0.02"/>
+    </body>
+    -->
+
+      <!-- Soft, even lighting: high overhead light with shadows disabled +
+           symmetric fill from the opposite side. -->
+      <light diffuse=".5 .5 .5" pos="0 0 20" dir="0 0 -1" castshadow="false"/>
+      <light diffuse=".3 .3 .3" pos=" 3.0  3.0 8" dir="-0.3 -0.3 -1" castshadow="false"/>
+      <light diffuse=".3 .3 .3" pos="-3.0 -3.0 8" dir=" 0.3  0.3 -1" castshadow="false"/>
+
+  </worldbody>
+
+  <keyframe>
+    <key name="home"
+      qpos="0 0 1.0 1 0 0 0 -0.2 0 0 0.4 -0.2 0 -0.2 0 0 0.4 -0.2 0 0 0 0 0 0.4 0 1.2 0 0 0 0 -0.4 0 1.2 0 0 0 0 0 0 0" />
+  </keyframe>
+</mujoco>
