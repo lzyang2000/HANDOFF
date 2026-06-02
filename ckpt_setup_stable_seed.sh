@@ -17,12 +17,12 @@
 # is consistent with the env reward shaping the student sees.
 
 # Stable WBC teacher -- from train_wbc_teacher_stable_seed.sh.
-export WBC_TEACHER_EXP="2026-05-20_00-34-48_g1_wbc_teacher_seed"
+export WBC_TEACHER_EXP="2026-06-01_02-50-43_g1_wbc_teacher_stable_seed"
 export WBC_TEACHER_PROJ="logs/rsl_rl/g1_wbc_teacher_stable_seed"
 export WBC_TEACHER_CKPT="-1"
 
 # Stable NoBV loco teacher -- from train_loco_teacher_nobv_stable_seed.sh.
-export LOCO_TEACHER_NOBV_EXP="2026-05-20_14-46-58_g1_loco_teacher_nobv_seed"
+export LOCO_TEACHER_NOBV_EXP="2026-06-01_02-50-52_g1_loco_teacher_nobv_stable_seed"
 export LOCO_TEACHER_NOBV_PROJ="logs/rsl_rl/g1_loco_teacher_nobv_stable_seed"
 export LOCO_TEACHER_NOBV_CKPT="-1"
 
