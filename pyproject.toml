@@ -12,11 +12,12 @@ dependencies = [
   "torch==2.8.0; sys_platform != 'linux' or platform_machine != 'aarch64'",
   "torch==2.9.1; sys_platform == 'linux' and platform_machine == 'aarch64'",
   # Deploy stack (deploy/play_sim_hand.sh / play_real_hand.sh):
-  "onnxruntime",   # ONNX policy inference (hand_policy / sim_policy nodes)
+  "onnxruntime<1.24",   # ONNX policy inference (hand_policy / sim_policy nodes); <1.24 keeps cp310 wheels (ROS humble → py3.10)
   "inputs",        # local xbox gamepad reader (xbox_node)
   "pin",           # pinocchio FK for the wrist leveller (hand_policy / sim_policy)
   "televuer",      # VR headset teleop bridge (dds_xr_node)
   "websockets",    # browser gamepad bridge for `xbox server` mode (gamepad_bridge)
+  "yourdfpy>=0.0.60",
 ]
 
 [project.entry-points."mjlab.tasks"]

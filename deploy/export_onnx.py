@@ -10,8 +10,42 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
   sys.path.insert(0, str(_REPO_ROOT))
 
+import glob
 import torch
 from dataclasses import asdict
+
+
+def _resolve_motion_file(configured: str) -> str:
+    """Return an existing motion file for env construction during export.
+
+    Prefers ``configured`` if it exists; otherwise grabs a single enriched
+    ``.pkl`` from a common local root. PklMotionLib accepts a single .pkl (it
+    need not be a yaml dataset), and the pkl must be enriched — carry
+    ``body_pos_w``/``body_quat_w`` (see enrich_pkl.py). The motion content does
+    not affect the exported actor; we only need one clip so PklMotionLib doesn't
+    hard-fail. Dataset paths baked into the config point at the origin machine's
+    handoff dirs, which may not exist here.
+    """
+    if configured and os.path.exists(configured):
+        return configured
+
+    for root in (
+        os.path.expanduser("~/twist2/seed_g1_enriched_pkl"),
+        os.path.expanduser("~/twist2"),
+        os.path.expanduser("~/handoff"),
+    ):
+        matches = sorted(glob.glob(os.path.join(root, "**", "*.pkl"), recursive=True))
+        if matches:
+            print(f"  Resolved motion file for export: {matches[0]}")
+            return matches[0]
+
+    raise FileNotFoundError(
+        "export_onnx could not find an enriched .pkl to build the env. "
+        f"Configured path was {configured!r} (missing). Searched under "
+        "~/twist2 and ~/handoff. Point motion_cmd.motion_file at an enriched "
+        ".pkl (see enrich_pkl.py)."
+    )
+
 
 def main():
     if len(sys.argv) < 3:
@@ -50,12 +84,18 @@ def main():
     if hasattr(env_cfg, 'viewer'):
         env_cfg.viewer.viewer = "auto"
 
-    # Provide a default motion file so export works without a full dataset.
-    _DEFAULT_MOTION_FILE = "/home/yangl/handoff/wbc_handoff_data/OMOMO_g1_GMR/sub1_clothesstand_000.pkl"
+    # Export only builds the env to resolve the observation space; the motion
+    # content is irrelevant to the exported actor, but PklMotionLib hard-fails
+    # if no motion loads. The dataset paths baked into the task config / training
+    # run point at the origin machine's handoff dirs (/home/yangl/handoff/...),
+    # which may not exist here. Resolve any single existing .pkl instead of
+    # hard-coding one machine-specific path.
     if "motion" in env_cfg.commands:
         motion_cmd = env_cfg.commands["motion"]
         if hasattr(motion_cmd, "motion_file"):
-            motion_cmd.motion_file = _DEFAULT_MOTION_FILE
+            motion_cmd.motion_file = _resolve_motion_file(
+                getattr(motion_cmd, "motion_file", "")
+            )
     
     env = ManagerBasedRlEnv(cfg=env_cfg, device=device)
     env = RslRlVecEnvWrapper(env)
