@@ -42,7 +42,7 @@
   <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2606.06493.pdf">
 
   <!-- Additional SEO -->
-  <meta name="theme-color" content="#2563eb">
+  <meta name="theme-color" content="#FF6C0C">
 
   <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -117,6 +117,13 @@
 
   <!-- Page-specific styling -->
   <style>
+    /* Recolor the template accent from blue to Caltech orange */
+    :root {
+      --primary-color: #FF6C0C;
+      --primary-hover: #e85f00;
+      --accent-color: #FF6C0C;
+      --gradient-accent: linear-gradient(135deg, #ffb066 0%, #ff6c0c 100%);
+    }
     .command-box {
       background: #f5f7fb;
       border: 1px solid #e2e8f0;
@@ -134,7 +141,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       font-size: 0.92rem;
     }
-    .property-card .prop-title { font-weight: 700; color: #2563eb; margin-bottom: .3rem; }
+    .property-card .prop-title { font-weight: 700; color: #FF6C0C; margin-bottom: .3rem; }
     .figure-caption { font-size: .9rem; color: #4a4a4a; margin-top: .6rem; }
     .results-table-wrap { overflow-x: auto; }
     table.handoff-table { font-size: .85rem; }
@@ -150,8 +157,8 @@
     }
     .teacher-tag {
       display: inline-block;
-      background: #eef4ff;
-      color: #2563eb;
+      background: #fff1e6;
+      color: #d95f00;
       border-radius: 6px;
       padding: .1rem .5rem;
       font-weight: 600;
@@ -185,6 +192,30 @@
       letter-spacing: 1.5px;
       text-shadow: 0 2px 12px rgba(0,0,0,0.45);
     }
+    /* Institution logos: white pill so the dark logos read on the dark banner */
+    .institution-logos {
+      display: inline-flex;
+      align-items: center;
+      gap: 34px;
+      margin: 1.3rem auto 0.25rem auto;
+      padding: 12px 28px;
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+    }
+    .institution-logos img { height: 40px; width: auto; display: block; }
+    /* Funding logos in the footer */
+    .funding-title { font-weight: 600; color: #363636; margin-bottom: 0.9rem !important; }
+    .funding-logos {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 48px;
+      flex-wrap: wrap;
+      margin-bottom: 0.9rem;
+    }
+    .funding-logos img { height: 46px; width: auto; display: block; }
+    .funding-note { font-size: 0.85rem; color: #6b7280; }
     /* Hide carousel arrows; navigate via the pagination dots. */
     .results-carousel .slider-navigation-previous,
     .results-carousel .slider-navigation-next { display: none !important; }
@@ -231,8 +262,22 @@
             </div>
 
             <div class="is-size-5 publication-authors">
-              <span class="author-block"><sup>1</sup>California Institute of Technology</span>&nbsp;&nbsp;
-              <span class="author-block"><sup>2</sup>The Institute for Human &amp; Machine Cognition</span>
+              <span class="author-block"><sup>1</sup><a href="http://www.bipedalrobotics.com" target="_blank">AMBER Lab</a>, California Institute of Technology</span>&nbsp;&nbsp;
+              <span class="author-block"><sup>2</sup><a href="https://www.ihmc.us" target="_blank">The Institute for Human &amp; Machine Cognition</a></span>
+            </div>
+
+            <div class="has-text-centered">
+              <div class="institution-logos">
+                <a href="http://www.bipedalrobotics.com" target="_blank" title="AMBER Lab">
+                  <img src="static/images/amber_black.svg" alt="AMBER Lab">
+                </a>
+                <a href="https://www.caltech.edu" target="_blank" title="California Institute of Technology">
+                  <img src="static/images/caltech.png" alt="California Institute of Technology">
+                </a>
+                <a href="https://www.ihmc.us" target="_blank" title="Institute for Human &amp; Machine Cognition">
+                  <img src="static/images/ihmc.jpg" alt="IHMC">
+                </a>
+              </div>
             </div>
 
             <div class="column has-text-centered">
@@ -461,9 +506,17 @@
     <div class="columns is-centered">
       <div class="column is-8">
         <div class="content">
-          <p class="has-text-centered">
-            This research is supported by The Dow Chemical Company project #227027AW and in part by the
-            Technology Innovation Institute (TII).
+          <p class="has-text-centered funding-title">This work is supported by:</p>
+          <div class="funding-logos">
+            <a href="https://www.dow.com/en-us.html" target="_blank" title="The Dow Chemical Company">
+              <img src="static/images/dow.svg" alt="The Dow Chemical Company">
+            </a>
+            <a href="https://www.tii.ae" target="_blank" title="Technology Innovation Institute">
+              <img src="static/images/tii.png" alt="Technology Innovation Institute">
+            </a>
+          </div>
+          <p class="has-text-centered funding-note">
+            The Dow Chemical Company project&nbsp;#227027AW, and in part by the Technology Innovation Institute (TII).
           </p>
           <p>
             This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
