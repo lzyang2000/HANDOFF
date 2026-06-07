@@ -4,7 +4,7 @@ Project website for **HANDOFF: Humanoid Agentic Task-Space Whole-Body Control vi
 
 - 📄 Paper: https://arxiv.org/abs/2606.06493
 - 💻 Code: https://github.com/lzyang2000/HANDOFF
-- 🌐 Live page: https://lzyang2000.github.io/handoff_wbc/
+- 🌐 Live page: https://lzyang2000.github.io/HANDOFF/
 
 Built from the [Academic Project Page Template](https://github.com/eliahuhorwitz/Academic-project-page-template)
 (adopted from the [Nerfies](https://nerfies.github.io) project page).
@@ -25,12 +25,12 @@ python -m http.server 8000
 
 ## Deploy (GitHub Pages)
 
-Push to the `handoff_wbc` repo and enable Pages on the `main` branch (root):
+Served from the `gh-pages` branch of the [HANDOFF code repo](https://github.com/lzyang2000/HANDOFF)
+(code stays on `main`). To update the live site, push these website commits to that branch:
 
 ```bash
-git remote add origin git@github.com:lzyang2000/handoff_wbc.git
-git push -u origin main
-# GitHub → Settings → Pages → Source: main / root
+git push git@github.com:lzyang2000/HANDOFF.git main:gh-pages
+# GitHub → HANDOFF repo → Settings → Pages → Source: gh-pages / root
 ```
 
 ## Re-compressing videos
