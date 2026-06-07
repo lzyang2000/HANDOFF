@@ -196,14 +196,11 @@
     .institution-logos {
       display: inline-flex;
       align-items: center;
-      gap: 34px;
-      margin: 1.3rem auto 0.25rem auto;
-      padding: 12px 28px;
-      background: #ffffff;
-      border-radius: 14px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.28);
+      gap: 48px;
+      margin: 1.5rem auto 0.25rem auto;
     }
-    .institution-logos img { height: 40px; width: auto; display: block; }
+    .institution-logos img { height: 56px; width: auto; display: block; }
+    .institution-logos img.invert-white { filter: brightness(0) invert(1); }
     /* Funding logos in the footer */
     .funding-title { font-weight: 600; color: #363636; margin-bottom: 0.9rem !important; }
     .funding-logos {
@@ -255,27 +252,27 @@
               <span class="author-block"><a href="https://junhengl.github.io" target="_blank">Junheng Li</a><sup>1</sup>,</span>
               <span class="author-block">Nehar Poddar<sup>2</sup>,</span>
               <span class="author-block">Yiling Hou<sup>1</sup>,</span>
-              <span class="author-block">Gio Huh<sup>1</sup>,</span>
+              <span class="author-block">Gio Huh<sup>1</sup>,</span><br>
               <span class="author-block"><a href="https://www.ihmc.us/groups/robert-griffin/" target="_blank">Robert Griffin</a><sup>2</sup>,</span>
               <span class="author-block"><a href="https://gkioxari.github.io" target="_blank">Georgia Gkioxari</a><sup>1</sup>,</span>
               <span class="author-block"><a href="https://scholar.google.com/citations?user=TjWwqmwAAAAJ&hl=en" target="_blank">Aaron D. Ames</a><sup>1</sup></span>
             </div>
 
             <div class="is-size-5 publication-authors">
-              <span class="author-block"><sup>1</sup><a href="http://www.bipedalrobotics.com" target="_blank">AMBER Lab</a>, California Institute of Technology</span>&nbsp;&nbsp;
+              <span class="author-block"><sup>1</sup><a href="http://www.bipedalrobotics.com" target="_blank">AMBER Lab, California Institute of Technology</a></span>&nbsp;&nbsp;
               <span class="author-block"><sup>2</sup><a href="https://www.ihmc.us" target="_blank">The Institute for Human &amp; Machine Cognition</a></span>
             </div>
 
             <div class="has-text-centered">
               <div class="institution-logos">
                 <a href="http://www.bipedalrobotics.com" target="_blank" title="AMBER Lab">
-                  <img src="static/images/amber_black.svg" alt="AMBER Lab">
+                  <img class="invert-white" src="static/images/amber_black.svg" alt="AMBER Lab">
                 </a>
                 <a href="https://www.caltech.edu" target="_blank" title="California Institute of Technology">
-                  <img src="static/images/caltech.png" alt="California Institute of Technology">
+                  <img src="static/images/caltech_trans.png" alt="California Institute of Technology">
                 </a>
                 <a href="https://www.ihmc.us" target="_blank" title="Institute for Human &amp; Machine Cognition">
-                  <img src="static/images/ihmc.jpg" alt="IHMC">
+                  <img src="static/images/ihmc_trans.png" alt="IHMC">
                 </a>
               </div>
             </div>
@@ -312,7 +309,6 @@
 </div>
 </div>
 </section>
-
 
 <!-- Paper abstract -->
 <section class="section hero is-light">
