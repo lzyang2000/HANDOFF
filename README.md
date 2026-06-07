@@ -1,6 +1,6 @@
 # HANDOFF: Humanoid Agentic Task-Space Whole-Body Control via Distilled Complementary Teachers
 
-By Lizhi Yang, Junheng Li, Nehar Poddar, Yiling Hou, Gio Huh, Robert Griffin, Georgia Gkioxari, Aaron D. Ames — Caltech AMBER Lab & IHMC, 2026
+Lizhi Yang, Junheng Li, Nehar Poddar, Yiling Hou, Gio Huh, Robert Griffin, Georgia Gkioxari, Aaron D. Ames — Caltech AMBER Lab & IHMC, 2026
 
 [[Website]](https://lzyang2000.github.io/HANDOFF/)
 [[arXiv]](https://arxiv.org/abs/2606.06493)
