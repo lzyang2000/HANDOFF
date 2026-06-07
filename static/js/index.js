@@ -90,53 +90,85 @@ window.addEventListener('scroll', function() {
     }
 });
 
-// Video carousel autoplay when in view
-function setupVideoCarouselAutoplay() {
-    const carouselVideos = document.querySelectorAll('.results-carousel video');
-    
-    if (carouselVideos.length === 0) return;
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            const video = entry.target;
-            if (entry.isIntersecting) {
-                // Video is in view, play it
-                video.play().catch(e => {
-                    // Autoplay failed, probably due to browser policy
-                    console.log('Autoplay prevented:', e);
-                });
-            } else {
-                // Video is out of view, pause it
-                video.pause();
-            }
-        });
-    }, {
-        threshold: 0.5 // Trigger when 50% of the video is visible
+// Video carousel: play each clip to its end, then advance to the next slide.
+// (Clip lengths differ, so we drive the carousel off the video instead of a fixed timer.)
+
+// The slide currently centered in the carousel viewport (works despite the loop clones).
+function getCenteredVideo() {
+    const root = document.querySelector('.results-carousel');
+    if (!root) return null;
+    const rb = root.getBoundingClientRect();
+    const center = rb.left + rb.width / 2;
+    let best = null, bestDist = Infinity;
+    root.querySelectorAll('video').forEach(v => {
+        const r = v.getBoundingClientRect();
+        if (r.width === 0) return; // skip hidden clones
+        const d = Math.abs((r.left + r.width / 2) - center);
+        if (d < bestDist) { bestDist = d; best = v; }
     });
-    
-    carouselVideos.forEach(video => {
-        observer.observe(video);
+    return best;
+}
+
+// Play the centered clip; pause the rest. restart=true rewinds it to the beginning.
+function playCenteredVideo(restart) {
+    const active = getCenteredVideo();
+    document.querySelectorAll('.results-carousel video').forEach(v => {
+        if (v !== active) { try { v.pause(); } catch (e) {} }
     });
+    if (active) {
+        if (restart) { try { active.currentTime = 0; } catch (e) {} }
+        active.play().catch(() => {});
+    }
 }
 
 $(document).ready(function() {
-    // Check for click events on the navbar burger icon
 
     var options = {
 		slidesToScroll: 1,
 		slidesToShow: 1,
 		loop: true,
 		infinite: true,
-		autoplay: true,
-		autoplaySpeed: 5000,
+		autoplay: false,   // advance when each clip ends, not on a timer
     }
 
 	// Initialize all div with carousel class
     var carousels = bulmaCarousel.attach('.carousel', options);
-	
+    var carousel = (carousels && carousels.length) ? carousels[0] : null;
+
     bulmaSlider.attach();
-    
-    // Setup video autoplay for carousel
-    setupVideoCarouselAutoplay();
+
+    // When a slide finishes transitioning, rewind+play the newly centered clip.
+    if (carousel) {
+        carousel.on('after:show', function () {
+            setTimeout(function () { playCenteredVideo(true); }, 350);
+        });
+    }
+
+    // When the centered clip ends, move to the next slide.
+    document.querySelectorAll('.results-carousel video').forEach(function (v) {
+        v.addEventListener('ended', function () {
+            if (carousel) { carousel.next(); }
+        });
+    });
+
+    // Pause when the carousel scrolls out of view; resume (without restarting) when back.
+    const carouselRoot = document.querySelector('.results-carousel');
+    if (carouselRoot) {
+        const obs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                    playCenteredVideo(false);
+                } else {
+                    document.querySelectorAll('.results-carousel video').forEach(function (v) {
+                        try { v.pause(); } catch (err) {}
+                    });
+                }
+            });
+        }, { threshold: 0.4 });
+        obs.observe(carouselRoot);
+    }
+
+    // Kick off the first clip.
+    setTimeout(function () { playCenteredVideo(true); }, 500);
 
 })

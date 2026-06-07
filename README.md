@@ -28,7 +28,7 @@ python -m http.server 8000
 Push to the `handoff_wbc` repo and enable Pages on the `main` branch (root):
 
 ```bash
-git remote add origin https://github.com/lzyang2000/handoff_wbc.git
+git remote add origin git@github.com:lzyang2000/handoff_wbc.git
 git push -u origin main
 # GitHub → Settings → Pages → Source: main / root
 ```
