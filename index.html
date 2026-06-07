@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="HANDOFF: Humanoid Agentic Task-Space Whole-Body Control via Distilled Complementary Teachers">
+  <meta name="description" content="HANDOFF is a single humanoid whole-body controller distilled from three complementary teachers that follows a compact, planner-friendly 10-D task-space command, driven end-to-end by a VLM agentic planner with no task-specific data or fine-tuning.">
+  <meta name="keywords" content="humanoid robot, whole-body control, loco-manipulation, reinforcement learning, knowledge distillation, mixture of experts, task and motion planning, Unitree G1, VLM agent">
+  <meta name="author" content="Lizhi Yang, Junheng Li, Nehar Poddar, Yiling Hou, Gio Huh, Robert Griffin, Georgia Gkioxari, Aaron D. Ames">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="California Institute of Technology">
+  <meta property="og:title" content="HANDOFF: Humanoid Agentic Task-Space Whole-Body Control via Distilled Complementary Teachers">
+  <meta property="og:description" content="A planner-friendly humanoid whole-body controller distilled from three complementary teachers under a compact 10-D task-space command interface.">
+  <meta property="og:url" content="https://lzyang2000.github.io/handoff_wbc/">
+  <meta property="og:image" content="https://lzyang2000.github.io/handoff_wbc/static/images/head.jpg">
+  <meta property="og:image:alt" content="HANDOFF teaser: Unitree G1 humanoid performing loco-manipulation">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="HANDOFF: Humanoid Agentic Task-Space Whole-Body Control via Distilled Complementary Teachers">
+  <meta name="twitter:description" content="A planner-friendly humanoid whole-body controller distilled from three complementary teachers under a compact 10-D task-space command interface.">
+  <meta name="twitter:image" content="https://lzyang2000.github.io/handoff_wbc/static/images/head.jpg">
+
+  <!-- Academic/Research Specific -->
+  <meta name="citation_title" content="HANDOFF: Humanoid Agentic Task-Space Whole-Body Control via Distilled Complementary Teachers">
+  <meta name="citation_author" content="Yang, Lizhi">
+  <meta name="citation_author" content="Li, Junheng">
+  <meta name="citation_author" content="Poddar, Nehar">
+  <meta name="citation_author" content="Hou, Yiling">
+  <meta name="citation_author" content="Huh, Gio">
+  <meta name="citation_author" content="Griffin, Robert">
+  <meta name="citation_author" content="Gkioxari, Georgia">
+  <meta name="citation_author" content="Ames, Aaron D.">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_arxiv_id" content="2606.06493">
+  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2606.06493.pdf">
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#2563eb">
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>HANDOFF: Humanoid Agentic Task-Space Whole-Body Control</title>
+
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link rel="apple-touch-icon" href="static/images/favicon.ico">
+
+  <!-- Critical CSS - Load synchronously -->
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <!-- Non-critical CSS - Load asynchronously -->
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <!-- FontAwesome icons are rendered as inline SVG by fontawesome.all.min.js (loaded below); the
+       webfont CSS is intentionally omitted because this template does not ship the webfont files. -->
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+  <!-- Fallback for browsers that don't support preload -->
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- MathJax for the command-space equation -->
+  <script>
+    window.MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }, svg: { fontCache: 'global' } };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <!-- Defer non-critical JavaScript -->
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "HANDOFF: Humanoid Agentic Task-Space Whole-Body Control via Distilled Complementary Teachers",
+    "description": "A planner-friendly humanoid whole-body controller distilled from three complementary teachers under a compact 10-D task-space command interface.",
+    "author": [
+      { "@type": "Person", "name": "Lizhi Yang", "affiliation": { "@type": "Organization", "name": "California Institute of Technology" } },
+      { "@type": "Person", "name": "Junheng Li", "affiliation": { "@type": "Organization", "name": "California Institute of Technology" } },
+      { "@type": "Person", "name": "Nehar Poddar", "affiliation": { "@type": "Organization", "name": "Institute for Human & Machine Cognition" } },
+      { "@type": "Person", "name": "Yiling Hou", "affiliation": { "@type": "Organization", "name": "California Institute of Technology" } },
+      { "@type": "Person", "name": "Gio Huh", "affiliation": { "@type": "Organization", "name": "California Institute of Technology" } },
+      { "@type": "Person", "name": "Robert Griffin", "affiliation": { "@type": "Organization", "name": "Institute for Human & Machine Cognition" } },
+      { "@type": "Person", "name": "Georgia Gkioxari", "affiliation": { "@type": "Organization", "name": "California Institute of Technology" } },
+      { "@type": "Person", "name": "Aaron D. Ames", "affiliation": { "@type": "Organization", "name": "California Institute of Technology" } }
+    ],
+    "datePublished": "2026",
+    "url": "https://lzyang2000.github.io/handoff_wbc/",
+    "image": "https://lzyang2000.github.io/handoff_wbc/static/images/head.jpg",
+    "keywords": ["humanoid robot", "whole-body control", "loco-manipulation", "reinforcement learning", "knowledge distillation", "mixture of experts"],
+    "isAccessibleForFree": true
+  }
+  </script>
+
+  <!-- Page-specific styling -->
+  <style>
+    .command-box {
+      background: #f5f7fb;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 1.25rem 1rem;
+      margin: 1.25rem auto 1.75rem auto;
+      overflow-x: auto;
+    }
+    .property-card {
+      background: #ffffff;
+      border: 1px solid #e6e9ef;
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      height: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .property-card .prop-title { font-weight: 700; color: #2563eb; margin-bottom: .35rem; }
+    .figure-caption { font-size: .9rem; color: #4a4a4a; margin-top: .6rem; }
+    .results-table-wrap { overflow-x: auto; }
+    table.handoff-table { font-size: .85rem; }
+    table.handoff-table td, table.handoff-table th { text-align: center; vertical-align: middle; }
+    table.handoff-table td:first-child, table.handoff-table th:first-child { text-align: left; }
+    .ours-row { background: #eef4ff; }
+    .video-caption {
+      font-size: .95rem;
+      color: #363636;
+      margin-top: .5rem;
+      padding: 0 1rem;
+    }
+    .teacher-tag {
+      display: inline-block;
+      background: #eef4ff;
+      color: #2563eb;
+      border-radius: 6px;
+      padding: .1rem .5rem;
+      font-weight: 600;
+      font-size: .85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">HANDOFF</h1>
+            <h2 class="subtitle is-4 publication-title" style="margin-top:-0.4rem;">Humanoid Agentic Task-Space Whole-Body Control via Distilled Complementary Teachers</h2>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><a href="https://lzyang2000.github.io" target="_blank">Lizhi Yang</a><sup>1</sup>,</span>
+              <span class="author-block">Junheng Li<sup>1</sup>,</span>
+              <span class="author-block">Nehar Poddar<sup>2</sup>,</span>
+              <span class="author-block">Yiling Hou<sup>1</sup>,</span>
+              <span class="author-block">Gio Huh<sup>1</sup>,</span>
+              <span class="author-block">Robert Griffin<sup>2</sup>,</span>
+              <span class="author-block"><a href="https://gkioxari.github.io" target="_blank">Georgia Gkioxari</a><sup>1</sup>,</span>
+              <span class="author-block">Aaron D. Ames<sup>1</sup></span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><sup>1</sup>California Institute of Technology</span>&nbsp;&nbsp;
+              <span class="author-block"><sup>2</sup>The Institute for Human &amp; Machine Cognition</span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="https://arxiv.org/pdf/2606.06493.pdf" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2606.06493" target="_blank"
+                class="external-link button is-normal is-rounded is-dark">
+                <span class="icon"><i class="ai ai-arxiv"></i></span>
+                <span>arXiv</span>
+              </a>
+            </span>
+
+            <span class="link-block">
+              <a href="https://github.com/lzyang2000/HANDOFF" target="_blank"
+              class="external-link button is-normal is-rounded is-dark">
+              <span class="icon"><i class="fab fa-github"></i></span>
+              <span>Code</span>
+            </a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</section>
+
+
+<!-- Teaser figure -->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/head.jpg" alt="HANDOFF teaser: Unitree G1 humanoid performing diverse loco-manipulation tasks driven by a VLM agentic planner."/>
+      <h2 class="subtitle has-text-centered figure-caption">
+        <strong>HANDOFF</strong> is a whole-body controller distilled from multiple teachers that accepts a compact, explicit 10-D planner-facing command.
+        We demonstrate its effectiveness using a VLM-powered agentic planner that needs no extensive demonstration collection or model fine-tuning.
+      </h2>
+    </div>
+  </div>
+</section>
+<!-- End teaser figure -->
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            For a humanoid robot to be deployed in the real world, the choice of command space &mdash; the interface
+            between task planning and whole-body control &mdash; is crucial. Existing whole-body controllers typically
+            demand dense kinematic or spatial references that planners struggle to synthesize from task semantics.
+            We instead propose a compact, explicit interface that is <em>intuitive</em>, <em>general</em>, <em>modular</em>,
+            and expressive enough for diverse manipulation skills.
+          </p>
+          <p>
+            To this end, we introduce <strong>HANDOFF</strong>, a single humanoid whole-body controller that follows this
+            interface and is distilled via multi-teacher KL distillation under a context-conditioned gating scheme into a
+            mixture-of-experts student from three complementary specialists: whole-body motion tracking with safety-filtered
+            data, locomotion, and fall-recovery. On the Unitree G1, HANDOFF matches state-of-the-art velocity tracking and
+            offers one of the largest robust manipulation workspaces. We further demonstrate hardware feasibility through
+            multiple natural-language-driven task roll-outs, powered by a VLM-driven agentic planner with no task-specific
+            data or controller fine-tuning.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+<!-- The 10-D interface -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">A compact, planner-friendly command space</h2>
+        <div class="content has-text-justified">
+          <p>
+            As humans, we do not reason about exact joint positions; we formulate sparse sub-goals
+            (&ldquo;find the coffee, walk near it, reach for it, grab it&rdquo;) and let lower-level motor
+            reflexes handle each step. Yet state-of-the-art whole-body controllers mostly operate under the
+            motion-tracking regime, requiring the planner to emit a dense, full-body kinematic stream at the
+            controller rate. HANDOFF instead targets a small, explicit 10-D command:
+          </p>
+          <div class="command-box has-text-centered">
+            $$ c_t = \bigl[\,v_x,\ v_y,\ \omega_z,\ z,\ p_L^P,\ p_R^P\,\bigr] $$
+          </div>
+          <p>
+            where $v_x, v_y, \omega_z$ are planar base velocity commands, $z$ is the commanded root height, and
+            $p_L^P, p_R^P$ are bilateral pelvis-frame wrist targets. Each component matches a planner family:
+            locomotion stacks emit $(v_x, v_y, \omega_z)$; grasp planners emit a pelvis-frame end-effector target;
+            any squat-or-reach heuristic sets $z$. The same 10-D vector composes into whole-body actions &mdash; a low
+            $z$ paired with forward wrist targets induces a coordinated squat-and-reach, while an asymmetric wrist
+            target during nonzero base velocity induces a one-handed reach-while-walking.
+          </p>
+        </div>
+        <div class="columns is-multiline" style="margin-top:0.5rem;">
+          <div class="column is-half">
+            <div class="property-card has-text-left">
+              <div class="prop-title">Intuitive</div>
+              A human, a geometric planner, or a VLM can each produce a valid executable command.
+            </div>
+          </div>
+          <div class="column is-half">
+            <div class="property-card has-text-left">
+              <div class="prop-title">General</div>
+              One interface serves different loco-manipulation tasks.
+            </div>
+          </div>
+          <div class="column is-half">
+            <div class="property-card has-text-left">
+              <div class="prop-title">Modular</div>
+              Planner, perception, and controller are decoupled and can be swapped independently.
+            </div>
+          </div>
+          <div class="column is-half">
+            <div class="property-card has-text-left">
+              <div class="prop-title">Whole-body expressive</div>
+              Compact commands still elicit coordinated full-body behavior.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End 10-D interface -->
+
+<!-- Method / system overview -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">Distilling three complementary teachers</h2>
+        <img src="static/images/system.png" alt="System overview: three teachers distilled into a mixture-of-experts student under context-based action-sliced KL."/>
+        <p class="figure-caption has-text-justified">
+          <strong>System overview.</strong> We train three teachers separately: a 29-DoF whole-body
+          motion-tracking teacher on CoP-filtered retargeted clips, a 15-DoF body-slice locomotion teacher on flat
+          terrain with curriculum-blended arm perturbations, and a 29-DoF fall-recovery teacher on locomotion + paired
+          fall-recovery clips. The mixture-of-experts student maps a 10-D command and 11-frame proprioception history to
+          29-DoF actions. Context-based action-sliced KL pulls the body slice toward a velocity-gated blend of the WBC
+          and locomotion teachers, the arm slice toward the WBC teacher, and the fall-recovery teacher onto the full
+          action when recovery is active; routing is shaped with load-balancing and recovery losses.
+        </p>
+      </div>
+    </div>
+
+    <div class="columns is-centered" style="margin-top:1.5rem;">
+      <div class="column is-two-thirds has-text-justified">
+        <div class="content">
+          <p>
+            Such a controller must track task-space commands, produce coordinated whole-body manipulation behavior, and
+            remain robust to disturbances such as recoverable falls &mdash; no single training regime delivers all three.
+            We therefore pose this as a problem of <em>utilizing expert specialists</em>, each trained in its own regime
+            on existing datasets, then composed into one deployable student via PPO together with multi-teacher KL
+            distillation and mixture-of-experts training under a context-conditioned gating scheme.
+          </p>
+          <ul>
+            <li><span class="teacher-tag">WBC teacher</span> &mdash; a 29-DoF motion-tracking specialist, a strong prior on posture, reach, squat, and bilateral coordination.</li>
+            <li><span class="teacher-tag">Locomotion teacher</span> &mdash; a 15-DoF body-slice policy with task-based velocity-tracking rewards, robust to arm-induced CoM shifts.</li>
+            <li><span class="teacher-tag">Fall-recovery teacher</span> &mdash; an Adversarial Motion Prior policy trained on paired fall-and-recovery sequences.</li>
+          </ul>
+          <p>
+            At runtime, the legs follow the locomotion teacher under nonzero commanded velocity, the arms follow the
+            motion-tracking teacher throughout, and the fall-recovery specialist assumes full supervision in niche
+            situations &mdash; all distilled into one coordinated policy under the single 10-D interface, with
+            <strong>no runtime controller switching</strong>. The hook is extensible: a new specialist plugs in as one
+            new teacher head and one new context channel, with no changes to existing teachers or the command interface.
+          </p>
+        </div>
+      </div>
+      <div class="column is-one-third">
+        <img src="static/images/cbf-filter.png" alt="CoP filtering: a closed-form CBF projection corrects dynamically infeasible retargeted frames."/>
+        <p class="figure-caption has-text-justified">
+          <strong>CoP filtering.</strong> The raw retargeted motion dataset contains dynamically infeasible frames,
+          which we correct with a closed-form CBF projection on the static-CoP margin before training. The corrected
+          reference (left) stays within the support polygon; the unfiltered version (right) drifts.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End method -->
+
+<!-- Agentic planner -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-full">
+        <h2 class="title is-3">An agentic planner that speaks the interface</h2>
+        <img src="static/images/agent.png" alt="Agentic deployment pipeline: natural-language instruction decomposed into atomic tasks, a VLM emits pelvis-frame waypoints, and a skill selector produces the 10-D command stream."/>
+        <p class="figure-caption has-text-justified">
+          <strong>Agentic deployment pipeline.</strong> A natural-language instruction (0.001&nbsp;Hz) is decomposed
+          into atomic tasks by a high-level reasoner (regex + LLM fallback). A VLM (0.1&nbsp;Hz) projects 2D detections
+          onto the RGB-D point cloud to emit pelvis-frame waypoints; a waypoint tracker produces $(v_x, v_y, \omega_z)$,
+          and near the target a skill selector emits root height $z$ and bilateral wrist targets $p_{R/L}^P$
+          (1&ndash;50&nbsp;Hz) with a kinematics-based wrist correction. The resulting 10-D stream feeds the distilled
+          controller (50&nbsp;Hz), whose 29-DoF actions are tracked on hardware at 500&nbsp;Hz.
+        </p>
+        <div class="content has-text-justified" style="margin-top:1rem;">
+          <p>
+            Everything above the controller is swappable as long as the planner emits the required 10-D command, be it
+            traditional task planning, agentic planning, or even vision-language-action models. The agentic planner is one
+            representative implementation of this interface; the hardware rollouts show it can be instantiated in an
+            untethered real-robot stack without task-specific controller retraining.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End agentic planner -->
+
+<!-- Video carousel: task rollouts -->
+<section class="hero is-small is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered">Task rollouts</h2>
+      <p class="has-text-centered content" style="max-width:780px;margin:0 auto 1.5rem auto;">
+        The same 10-D controller, driven by the agentic planner from a natural-language instruction, executing a range
+        of loco-manipulation tasks on the Unitree G1 hardware and in simulation. No controller-side change, data
+        collection, or model fine-tuning is required between tasks.
+      </p>
+      <div id="results-carousel" class="carousel results-carousel">
+        <div class="item">
+          <video poster="static/videos/task1_poster.jpg" id="video1" controls muted loop playsinline height="100%" preload="metadata">
+            <source src="static/videos/task1.mp4" type="video/mp4">
+          </video>
+          <p class="video-caption has-text-centered"><strong>Pick-and-place.</strong> &ldquo;Put the mustard bottle in the red plate.&rdquo;</p>
+        </div>
+        <div class="item">
+          <video poster="static/videos/task2_poster.jpg" id="video2" controls muted loop playsinline height="100%" preload="metadata">
+            <source src="static/videos/task2.mp4" type="video/mp4">
+          </video>
+          <p class="video-caption has-text-centered"><strong>Pick-transport-place.</strong> &ldquo;Pick up the W bottle, turn around and put it in the grey bin.&rdquo;</p>
+        </div>
+        <div class="item">
+          <video poster="static/videos/task3_poster.jpg" id="video3" controls muted loop playsinline height="100%" preload="metadata">
+            <source src="static/videos/task3.mp4" type="video/mp4">
+          </video>
+          <p class="video-caption has-text-centered"><strong>Squat-pick.</strong> &ldquo;Pick up the Pringles chip bottle, turn right and put it to the left of the Cheez-It box.&rdquo;</p>
+        </div>
+        <div class="item">
+          <video poster="static/videos/task4_poster.jpg" id="video4" controls muted loop playsinline height="100%" preload="metadata">
+            <source src="static/videos/task4.mp4" type="video/mp4">
+          </video>
+          <p class="video-caption has-text-centered"><strong>Bimanual pick-and-hand-off.</strong> &ldquo;Pick up the blue box with both hands, turn around and hand it over.&rdquo;</p>
+        </div>
+        <div class="item">
+          <video poster="static/videos/task5_poster.jpg" id="video5" controls muted loop playsinline height="100%" preload="metadata">
+            <source src="static/videos/task5.mp4" type="video/mp4">
+          </video>
+          <p class="video-caption has-text-centered"><strong>Bilateral pick-and-place.</strong> &ldquo;Put the mustard bottle on the red plate, then put the orange bottle on the wood board.&rdquo;</p>
+        </div>
+        <div class="item">
+          <video poster="static/videos/task6_poster.jpg" id="video6" controls muted loop playsinline height="100%" preload="metadata">
+            <source src="static/videos/task6.mp4" type="video/mp4">
+          </video>
+          <p class="video-caption has-text-centered"><strong>Task continuation after fall recovery (sim).</strong> &ldquo;Pick up the shampoo bottle, turn right and put it in the metal bin&rdquo; &mdash; with push recovery.</p>
+        </div>
+        <div class="item">
+          <video poster="static/videos/teleop_poster.jpg" id="video7" controls muted loop playsinline height="100%" preload="metadata">
+            <source src="static/videos/teleop.mp4" type="video/mp4">
+          </video>
+          <p class="video-caption has-text-centered"><strong>Teleoperation demonstration.</strong> Whole-body expressiveness driven directly through the 10-D interface &mdash; playing badminton.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End video carousel -->
+
+<!-- Results -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Results</h2>
+
+    <div class="columns is-centered has-text-centered" style="margin-bottom:1rem;">
+      <div class="column is-full">
+        <img src="static/images/experiment_snapshots.jpg" alt="Agentic deployment snapshots: the same 10-D controller executing diverse loco-manipulation tasks on hardware and in simulation."/>
+        <p class="figure-caption has-text-justified">
+          <strong>Agentic deployment snapshots.</strong> The same 10-D controller, driven by the agentic planner,
+          executing a range of loco-manipulation tasks on the Unitree G1 hardware and in simulation: pick-and-place,
+          pick-transport-place, squat-pick, bimanual-pick-and-hand-off, bilateral pick-and-place, and task continuation
+          after fall recovery. No controller-side change, data collection, or model fine-tuning is required between tasks.
+        </p>
+      </div>
+    </div>
+
+    <div class="content has-text-justified">
+      <p>
+        We evaluate the controller on two quantitative axes. For <strong>velocity tracking</strong>, we sweep per-axis
+        velocity commands along $[-1, 1]$ and report the mean absolute error between commanded and realized base twist.
+        For the <strong>manipulation workspace</strong>, we sample bilateral wrist targets in the pelvis frame and report
+        the <em>robust workspace</em> volume (hull volume scaled by the feasible fraction) in the forward half-space, where
+        every loco-manipulation task we care about happens.
+      </p>
+    </div>
+
+    <div class="columns">
+      <div class="column is-half">
+        <h3 class="title is-5 has-text-centered">Ablation progression</h3>
+        <div class="results-table-wrap">
+          <table class="table is-fullwidth is-narrow is-hoverable handoff-table">
+            <thead>
+              <tr>
+                <th>Ablation</th><th>|&Delta;v<sub>x</sub>|&darr;</th><th>|&Delta;v<sub>y</sub>|&darr;</th><th>|&Delta;&omega;<sub>z</sub>|&darr;</th><th>Robust WS&uarr;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Direct</td><td>0.29</td><td>0.43</td><td>0.08</td><td>0.20</td></tr>
+              <tr><td>+ Dual teacher</td><td>0.14</td><td>0.25</td><td>0.09</td><td><strong>0.31</strong></td></tr>
+              <tr><td>+ RandCmd</td><td>0.14</td><td><strong>0.13</strong></td><td>0.05</td><td>0.29</td></tr>
+              <tr class="ours-row"><td>+ Split KL + MoE (Ours)</td><td><strong>0.07</strong></td><td>0.14</td><td><strong>0.04</strong></td><td>0.27</td></tr>
+              <tr class="ours-row"><td>+ AMP recovery (Ours + Rec.)</td><td><strong>0.07</strong></td><td>0.15</td><td>0.05</td><td>0.26</td></tr>
+              <tr class="ours-row"><td>+ Stability (Ours + Stab.)</td><td><strong>0.07</strong></td><td>0.18</td><td><strong>0.04</strong></td><td><strong>0.31</strong></td></tr>
+              <tr class="ours-row"><td>+ Stab. + Rec.</td><td><strong>0.06</strong></td><td>0.18</td><td>0.06</td><td><strong>0.31</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="column is-half">
+        <h3 class="title is-5 has-text-centered">Comparison with SOTA controllers</h3>
+        <div class="results-table-wrap">
+          <table class="table is-fullwidth is-narrow is-hoverable handoff-table">
+            <thead>
+              <tr>
+                <th>Method</th><th>|&Delta;v<sub>x</sub>|&darr;</th><th>|&Delta;v<sub>y</sub>|&darr;</th><th>|&Delta;&omega;<sub>z</sub>|&darr;</th><th>Feas.%&uarr;</th><th>Robust WS&uarr;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>FALCON</td><td>0.07</td><td><strong>0.10</strong></td><td>0.07</td><td>35.5</td><td>0.06</td></tr>
+              <tr><td>OpenHomie</td><td>0.06</td><td>0.12</td><td>0.10</td><td>62.9</td><td>0.15</td></tr>
+              <tr><td>AMO</td><td>0.06</td><td>0.19</td><td><strong>0.01</strong></td><td>80.9</td><td>0.22</td></tr>
+              <tr><td>SONIC</td><td><strong>0.03</strong></td><td>0.15</td><td>0.02</td><td>89.8</td><td>0.26</td></tr>
+              <tr class="ours-row"><td>Ours</td><td>0.07</td><td>0.14</td><td>0.04</td><td>87.1</td><td>0.27</td></tr>
+              <tr class="ours-row"><td>Ours + Rec.</td><td>0.07</td><td>0.15</td><td>0.05</td><td>92.0</td><td>0.26</td></tr>
+              <tr class="ours-row"><td>Ours + Stab.</td><td>0.07</td><td>0.18</td><td>0.04</td><td><strong>97.7</strong></td><td><strong>0.31</strong></td></tr>
+              <tr class="ours-row"><td>Ours + Stab. + Rec.</td><td><strong>0.06</strong></td><td>0.18</td><td>0.06</td><td>90.8</td><td><strong>0.31</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <p class="figure-caption has-text-centered">
+      Velocity errors are mean |cmd&minus;realized| (m/s, rad/s) over the $[-1,1]$ sweep. <em>Feas.</em> is the fraction of
+      bilateral wrist-target trials with wrist error under 15&nbsp;cm, no fall, and pelvis drift under 25&nbsp;cm;
+      <em>Robust WS</em> (m<sup>3</sup>) is the wrist-workspace hull volume scaled by feasibility in the forward half-space.
+    </p>
+
+    <div class="columns is-centered" style="margin-top:1.5rem;">
+      <div class="column is-half has-text-centered">
+        <img src="static/images/figure2_sota_overlay.png" alt="Velocity-tracking sweep compared against state-of-the-art controllers."/>
+        <p class="figure-caption">Velocity-tracking sweep vs. SOTA controllers.</p>
+      </div>
+      <div class="column is-half has-text-centered">
+        <img src="static/images/workspace_hulls_phaseB_front.png" alt="Forward-half-space robust workspace hulls."/>
+        <p class="figure-caption">Robust bilateral wrist-target workspace hulls (forward half-space).</p>
+      </div>
+    </div>
+
+    <div class="content has-text-justified" style="margin-top:1rem;">
+      <p>
+        Even under a favorable differential-IK adapter that equips each baseline with pelvis-frame wrist targets, our
+        velocity tracking sits within the SOTA cluster on every axis while delivering the largest robust workspace
+        (0.31&nbsp;m<sup>3</sup>); Ours&nbsp;+&nbsp;Stab. takes the best feasibility (97.7%). HANDOFF stays competitive
+        because it learns wrist-target, locomotion, and balance coupling natively rather than through an external
+        translation layer.
+      </p>
+    </div>
+  </div>
+</section>
+<!-- End results -->
+
+<!-- BibTeX citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@article{yang2026handoff,
+  title   = {HANDOFF: Humanoid Agentic Task-Space Whole-Body Control via Distilled Complementary Teachers},
+  author  = {Yang, Lizhi and Li, Junheng and Poddar, Nehar and Hou, Yiling and Huh, Gio and Griffin, Robert and Gkioxari, Georgia and Ames, Aaron D.},
+  journal = {arXiv preprint arXiv:2606.06493},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2606.06493}
+}</code></pre>
+    </div>
+</section>
+<!-- End BibTeX citation -->
+
+  <footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p class="has-text-centered">
+            This research is supported by The Dow Chemical Company project #227027AW and in part by the
+            Technology Innovation Institute (TII).
+          </p>
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+  </main>
+  </body>
+  </html>
