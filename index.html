@@ -142,6 +142,38 @@
       font-size: 0.92rem;
     }
     .property-card .prop-title { font-weight: 700; color: #FF6C0C; margin-bottom: .3rem; }
+    .cmd-compare { margin-top: 1.5rem; }
+    .cmd-compare-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .cmd-compare-item { flex: 1 1 0; margin: 0; min-width: 0; }
+    .cmd-compare-item video {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #e6e9ef;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: block;
+    }
+    .cmd-compare-arrow, .cmd-compare-arrow-spacer { flex: 0 0 2.5rem; text-align: center; }
+    .cmd-compare-arrow {
+      font-size: 2.4rem;
+      line-height: 1;
+      color: #FF6C0C;
+      font-weight: 700;
+    }
+    .cmd-compare-caps { align-items: flex-start; margin-top: 0.5rem; }
+    .cmd-cap {
+      flex: 1 1 0;
+      min-width: 0;
+      text-align: center;
+      font-size: 0.88rem;
+      color: #4a4a4a;
+      margin: 0;
+    }
+    .cmd-cap strong { color: #FF6C0C; }
     .figure-caption { font-size: .9rem; color: #4a4a4a; margin-top: .6rem; }
     .results-table-wrap { overflow-x: auto; }
     table.handoff-table { font-size: .85rem; }
@@ -383,6 +415,26 @@
               <div class="prop-title">Whole-body expressive</div>
               Compact commands still elicit coordinated full-body behavior.
             </div>
+          </div>
+        </div>
+        <div class="cmd-compare">
+          <div class="cmd-compare-row">
+            <div class="cmd-compare-item">
+              <video poster="static/videos/full-order_poster.jpg" autoplay loop muted playsinline preload="metadata">
+                <source src="static/videos/full-order.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="cmd-compare-arrow" aria-hidden="true">&rarr;</div>
+            <div class="cmd-compare-item">
+              <video poster="static/videos/our_poster.jpg" autoplay loop muted playsinline preload="metadata">
+                <source src="static/videos/our.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+          <div class="cmd-compare-row cmd-compare-caps">
+            <p class="cmd-cap"><strong>Whole-body motion (29-D):</strong> A dense reference the controller must track.</p>
+            <div class="cmd-compare-arrow-spacer" aria-hidden="true"></div>
+            <p class="cmd-cap"><strong>Our 10-D command:</strong> The same behavior from a compact, planner-friendly command.</p>
           </div>
         </div>
       </div>
