@@ -17,7 +17,7 @@ automatically when no local training run is found.
    - Disclaimer: the bundled policy is provided for convenience and has been
      validated in simulation. **Deploy on real hardware at your own risk** —
      always verify behavior in sim first, keep an e-stop within reach, and start
-     in a safe, clear workspace.
+     in a safe, clear workspace. (Sorry about the artifacts - seems to be a screen recording issue.)
 
 <table>
   <tr>
