@@ -46,9 +46,7 @@ VEL_LIMITS = np.array([MAX_VX, MAX_VY, MAX_YAW], dtype=np.float32)
 # ---------------------------------------------------------------------------
 # Torso limits
 # ---------------------------------------------------------------------------
-PITCH_POS_LIMIT = 0.8
-PITCH_NEG_LIMIT = -0.2
-HEIGHT_MIN = 0.26
+HEIGHT_MIN = 0.3
 HEIGHT_MAX = 0.78
 
 # ---------------------------------------------------------------------------
@@ -74,7 +72,6 @@ GRIPPER_CLOSED = 1.0
 # ---------------------------------------------------------------------------
 # Default offsets (standing pose with arms at rest)
 # ---------------------------------------------------------------------------
-DEFAULT_PITCH = -0.09
 DEFAULT_HEIGHT_OFFSET = -0.0
 DEFAULT_HAND_X = 0.12
 DEFAULT_HAND_Y = 0.00
@@ -92,12 +89,10 @@ KEYBOARD_VY_STEP = 0.02
 KEYBOARD_YAW_STEP = 0.04
 KEYBOARD_HAND_STEP = 0.005
 KEYBOARD_HEIGHT_STEP = 0.002
-KEYBOARD_PITCH_STEP = 0.005
 KEYBOARD_WRIST_ROLL_STEP = 0.03
 KEYBOARD_GRIPPER_STEP = 0.04
 
 # Xbox / gamepad continuous speeds (per tick at PUBLISH_RATE_HZ)
-GAMEPAD_PITCH_SPEED = 0.005
 GAMEPAD_HEIGHT_SPEED = 0.002
 GAMEPAD_HAND_SPEED = 0.005
 

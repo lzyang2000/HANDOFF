@@ -1,7 +1,7 @@
 """Xbox controller node publishing the unified command message.
 
 Publishes:
-  /g1/command  (std_msgs/Float32MultiArray)  – 19-float unified command
+  /g1/command  (std_msgs/Float32MultiArray)  – 18-float unified command
                (see deploy/common/command.py for field layout)
 
 Button / axis mapping (Xbox One / 360 layout via linux ``inputs``):
@@ -14,8 +14,6 @@ Button / axis mapping (Xbox One / 360 layout via linux ``inputs``):
   D-pad Left/Right -> right hand lateral (y offset)
   LB  (BTN_TL)  -> right hand down (z offset)
   RB  (BTN_TR)  -> right hand up   (z offset)
-  Y   (BTN_NORTH) -> torso pitch up
-  A   (BTN_SOUTH) -> torso pitch down
   Start/Back     -> reset all commands to defaults
 """
 
@@ -32,7 +30,6 @@ from std_msgs.msg import Float32MultiArray, String
 from deploy.common.command import (
     CMD_HEIGHT,
     CMD_LEFT_HAND,
-    CMD_PITCH,
     CMD_RIGHT_HAND,
     CMD_VX,
     CMD_VY,
@@ -52,7 +49,6 @@ from teleop_common import (
     VIZ_QOS,
     GAMEPAD_HAND_SPEED,
     GAMEPAD_HEIGHT_SPEED,
-    GAMEPAD_PITCH_SPEED,
     HAND_NEG_LIMIT_XYZ,
     HAND_POS_LIMIT_XYZ,
     HEIGHT_MAX,
@@ -62,8 +58,6 @@ from teleop_common import (
     MAX_VX,
     MAX_VY,
     MAX_YAW,
-    PITCH_NEG_LIMIT,
-    PITCH_POS_LIMIT,
     PUBLISH_RATE_HZ,
     format_command,
 )
@@ -72,7 +66,6 @@ from wbc_mjlab.g1_constants_custom import (
     DEFAULT_HAND_Y,
     DEFAULT_HAND_Z,
     DEFAULT_HEIGHT,
-    DEFAULT_PITCH,
     NOMINAL_LEFT_HAND_BODY,
     NOMINAL_RIGHT_HAND_BODY,
 )
@@ -93,7 +86,6 @@ class XboxNode(Node):
         self._vx = 0.0
         self._vy = 0.0
         self._yaw = 0.0
-        self._pitch = DEFAULT_PITCH
         self._height = DEFAULT_HEIGHT
 
         self._right_hand = np.array([DEFAULT_HAND_X, DEFAULT_HAND_Y, DEFAULT_HAND_Z], dtype=np.float32)
@@ -136,8 +128,6 @@ class XboxNode(Node):
         self._hat_y  = 0
         self._btn_lb = 0
         self._btn_rb = 0
-        self._btn_a  = 0
-        self._btn_y  = 0
 
         self._thread = threading.Thread(target=self._monitor_controller, daemon=True)
         self._thread.start()
@@ -150,7 +140,6 @@ class XboxNode(Node):
             "  LT / RT       -> torso height - / +\n"
             "  D-pad         -> right hand forward/back (Y) and lateral (X)\n"
             "  LB / RB       -> right hand down / up (z)\n"
-            "  A / Y         -> torso pitch down / up\n"
             "  Start / Back  -> reset all to defaults"
         )
 
@@ -162,13 +151,11 @@ class XboxNode(Node):
             BridgeConfig(
                 max_vx=MAX_VX, max_vy=MAX_VY, max_yaw=MAX_YAW,
                 height_min=HEIGHT_MIN, height_max=HEIGHT_MAX,
-                pitch_pos_limit=PITCH_POS_LIMIT, pitch_neg_limit=PITCH_NEG_LIMIT,
                 hand_pos_limit_xyz=tuple(HAND_POS_LIMIT_XYZ.tolist()),
                 hand_neg_limit_xyz=tuple(HAND_NEG_LIMIT_XYZ.tolist()),
                 left_hand_pos_limit_xyz=tuple(LEFT_HAND_POS_LIMIT_XYZ.tolist()),
                 left_hand_neg_limit_xyz=tuple(LEFT_HAND_NEG_LIMIT_XYZ.tolist()),
                 default_height=DEFAULT_HEIGHT,
-                default_pitch=DEFAULT_PITCH,
                 default_hand_x=DEFAULT_HAND_X,
                 default_hand_y=DEFAULT_HAND_Y,
                 default_hand_z=DEFAULT_HAND_Z,
@@ -176,7 +163,6 @@ class XboxNode(Node):
                 tick_hz=PUBLISH_RATE_HZ,
                 gamepad_hand_speed=GAMEPAD_HAND_SPEED,
                 gamepad_height_speed=GAMEPAD_HEIGHT_SPEED,
-                gamepad_pitch_speed=GAMEPAD_PITCH_SPEED,
                 label="deploy xbox_node gamepad bridge",
             )
         )
@@ -208,7 +194,6 @@ class XboxNode(Node):
         self._vx = 0.0
         self._vy = 0.0
         self._yaw = 0.0
-        self._pitch = DEFAULT_PITCH
         self._height = DEFAULT_HEIGHT
         self._right_hand[:] = [DEFAULT_HAND_X,  DEFAULT_HAND_Y, DEFAULT_HAND_Z]
         self._left_hand[:]  = [DEFAULT_HAND_X, -DEFAULT_HAND_Y, DEFAULT_HAND_Z]
@@ -217,7 +202,6 @@ class XboxNode(Node):
         self._vx    = float(np.clip(self._vx,    -MAX_VX,  MAX_VX))
         self._vy    = float(np.clip(self._vy,    -MAX_VY,  MAX_VY))
         self._yaw   = float(np.clip(self._yaw,   -MAX_YAW, MAX_YAW))
-        self._pitch = float(np.clip(self._pitch,  PITCH_NEG_LIMIT, PITCH_POS_LIMIT))
         self._height = float(np.clip(self._height, HEIGHT_MIN, HEIGHT_MAX))
         self._right_hand = np.clip(self._right_hand, HAND_NEG_LIMIT_XYZ, HAND_POS_LIMIT_XYZ)
         self._left_hand = np.clip(self._left_hand, LEFT_HAND_NEG_LIMIT_XYZ, LEFT_HAND_POS_LIMIT_XYZ)
@@ -232,11 +216,6 @@ class XboxNode(Node):
         self._vx  = -raw_ly * MAX_VX  if abs(raw_ly) > dz else 0.0
         self._vy  = -raw_lx * MAX_VY  if abs(raw_lx) > dz else 0.0
         self._yaw = -raw_rx * MAX_YAW if abs(raw_rx) > dz else 0.0
-
-        if self._btn_y:
-            self._pitch += GAMEPAD_PITCH_SPEED
-        if self._btn_a:
-            self._pitch -= GAMEPAD_PITCH_SPEED
 
         lt_norm = self._abs_z  / 255.0
         rt_norm = self._abs_rz / 255.0
@@ -296,15 +275,13 @@ class XboxNode(Node):
                                 print(
                                     f"cmd_vel {format_command(np.array([self._vx, self._vy, self._yaw]))}"
                                     f"  hand_r=[{self._right_hand[0]:+.2f},{self._right_hand[1]:+.2f},{self._right_hand[2]:+.2f}]"
-                                    f"  h={self._height:.3f} p={self._pitch:+.3f}"
+                                    f"  h={self._height:.3f}"
                                 )
                                 last_print = now
 
                     elif event.ev_type == "Key":
                         if   event.code == "BTN_TL":    self._btn_lb = event.state
                         elif event.code == "BTN_TR":    self._btn_rb = event.state
-                        elif event.code == "BTN_SOUTH": self._btn_a  = event.state
-                        elif event.code == "BTN_NORTH": self._btn_y  = event.state
                         if event.code in ("BTN_START", "BTN_SELECT"):
                             if event.state == 1:
                                 with self._lock:
@@ -324,7 +301,7 @@ class XboxNode(Node):
             with self._lock:
                 self._update_from_gamepad()
                 vx, vy, yaw = self._vx, self._vy, self._yaw
-                pitch, height = self._pitch, self._height
+                height = self._height
                 right = self._right_hand.copy()
                 left = self._left_hand.copy()
         else:
@@ -332,7 +309,7 @@ class XboxNode(Node):
             # bridge state already holds absolute values. No re-integration.
             s = self._bridge.get_state()
             vx, vy, yaw = s["vx"], s["vy"], s["yaw"]
-            pitch, height = s["pitch"], s["height"]
+            height = s["height"]
             right = s["right_hand"]
             left = s["left_hand"]
 
@@ -340,7 +317,6 @@ class XboxNode(Node):
         cmd[CMD_VX] = vx
         cmd[CMD_VY] = vy
         cmd[CMD_YAW_RATE] = yaw
-        cmd[CMD_PITCH] = pitch
         cmd[CMD_HEIGHT] = height
         cmd[CMD_LEFT_HAND:CMD_LEFT_HAND + 3] = NOMINAL_LEFT_HAND_BODY + left
         cmd[CMD_RIGHT_HAND:CMD_RIGHT_HAND + 3] = NOMINAL_RIGHT_HAND_BODY + right

@@ -519,7 +519,6 @@ MOLMO_DEFAULT_POINT_COORD_MODE: str = "norm1000"
 # MOLMO_DEFAULT_PROMPT: str = "pick up the red box and put it in the green bin, then pick up the blue box and put it in the yellow bin, turn right, then pick up the purple box with both hands then turn right and put it on the table"
 MOLMO_DEFAULT_PROMPT: str = "Pick up the blue box with both hands, turn around and hand it over"
 
-DEFAULT_PITCH: float = -0.09
 DEFAULT_HEIGHT: float = 0.78
 DEFAULT_HAND_X: float = 0.162
 DEFAULT_HAND_Y: float = 0.00
@@ -997,13 +996,11 @@ def _build_nominal_command() -> np.ndarray:
   from deploy.common.command import (
     CMD_HEIGHT,
     CMD_LEFT_HAND,
-    CMD_PITCH,
     CMD_RIGHT_HAND,
     CMD_SIZE,
   )
 
   cmd = np.zeros(CMD_SIZE, dtype=np.float32)
-  cmd[CMD_PITCH] = -0.09
   # TODO update this to match the walking pose for easier transitions
   cmd[CMD_HEIGHT] = 0.78
   cmd[CMD_LEFT_HAND:CMD_LEFT_HAND + 3] = NOMINAL_LEFT_HAND_BODY + DEFAULT_LEFT_HAND_OFFSET

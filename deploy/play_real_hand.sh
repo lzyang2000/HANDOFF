@@ -95,21 +95,31 @@ ONNX_MODEL="${1:-}"
 
 if [[ -z "${ONNX_MODEL}" ]]; then
   EXPERIMENT_DIR="${ROOT_DIR}/logs/rsl_rl/${HAND_EXPERIMENT_NAME}"
-  LATEST_RUN="$(ls -dt "${EXPERIMENT_DIR}"/*/ 2>/dev/null | head -1)"
-  if [[ -z "${LATEST_RUN}" ]]; then
-    echo "Error: No runs found in ${EXPERIMENT_DIR}/" >&2
-    exit 1
+  # (Nom): nullglob + sort by mtime (newest first); no error when nothing matches.
+  RUNS=("${EXPERIMENT_DIR}"/*/(Nom))
+  LATEST_RUN="${RUNS[1]:-}"
+  LATEST_CKPT=""
+  if [[ -n "${LATEST_RUN}" ]]; then
+    CKPTS=("${LATEST_RUN}"model_*.pt(N))
+    if (( ${#CKPTS} )); then
+      LATEST_CKPT="$(printf '%s\n' "${CKPTS[@]}" | sed 's/.*model_\([0-9]*\)\.pt/\1 &/' | sort -n | tail -1 | cut -d' ' -f2-)"
+    fi
   fi
-  LATEST_CKPT="$(ls "${LATEST_RUN}"model_*.pt 2>/dev/null | sed 's/.*model_\([0-9]*\)\.pt/\1 &/' | sort -n | tail -1 | cut -d' ' -f2-)"
-  if [[ -z "${LATEST_CKPT}" ]]; then
-    echo "Error: No .pt checkpoints found in ${LATEST_RUN}" >&2
-    exit 1
+  if [[ -n "${LATEST_CKPT}" ]]; then
+    echo "Exporting ONNX from: ${LATEST_CKPT}"
+    uv run --python "${UV_PYTHON}" python deploy/export_onnx.py "${HAND_EXPORT_TASK}" "${LATEST_CKPT}"
+    ONNX_MODEL="$(ls -t "${LATEST_RUN}"*.onnx 2>/dev/null | head -1)"
+    [[ -z "${ONNX_MODEL}" ]] && { echo "Error: ONNX export failed." >&2; exit 1; }
+    echo "Using checkpoint: ${LATEST_CKPT}"
+  else
+    # No trained checkpoints found; fall back to the bundled policy.
+    ONNX_MODEL="${SCRIPT_DIR}/ckpt/policy.onnx"
+    if [[ ! -f "${ONNX_MODEL}" ]]; then
+      echo "Error: No checkpoints found and no bundled policy at ${ONNX_MODEL}" >&2
+      exit 1
+    fi
+    echo "No trained checkpoints found; using bundled policy: ${ONNX_MODEL}"
   fi
-  echo "Exporting ONNX from: ${LATEST_CKPT}"
-  uv run --python "${UV_PYTHON}" python deploy/export_onnx.py "${HAND_EXPORT_TASK}" "${LATEST_CKPT}"
-  ONNX_MODEL="$(ls -t "${LATEST_RUN}"*.onnx 2>/dev/null | head -1)"
-  [[ -z "${ONNX_MODEL}" ]] && { echo "Error: ONNX export failed." >&2; exit 1; }
-  echo "Using checkpoint: ${LATEST_CKPT}"
 elif [[ "${ONNX_MODEL}" == *.pt ]]; then
   shift
   PT_PATH="$(realpath "${ONNX_MODEL}")"

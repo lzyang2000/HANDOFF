@@ -2,7 +2,7 @@
 """TeleVuer-driven DDS XR controller node for the G1 hand sim.
 
 Publishes:
-  /g1/command   (std_msgs/Float32MultiArray) - unified command (19 floats)
+  /g1/command   (std_msgs/Float32MultiArray) - unified command (18 floats)
 
 The node supports both TeleVuer controller tracking and hand tracking.
 Controller tracking uses thumbsticks for base velocity and wrist poses for
@@ -31,7 +31,6 @@ from deploy.common.command import (
     CMD_LEFT_GRIPPER,
     CMD_LEFT_HAND,
     CMD_LEFT_WRIST,
-    CMD_PITCH,
     CMD_RIGHT_GRIPPER,
     CMD_RIGHT_HAND,
     CMD_RIGHT_WRIST,
@@ -54,7 +53,6 @@ from teleop_common import (
     DEFAULT_HAND_Y,
     DEFAULT_HAND_Z,
     DEFAULT_HEIGHT_OFFSET,
-    DEFAULT_PITCH,
     VIZ_QOS,
     HAND_ALPHA,
     HAND_NEG_LIMIT_XYZ,
@@ -66,8 +64,6 @@ from teleop_common import (
     MAX_VY,
     MAX_YAW,
     NOMINAL_ROOT_Z,
-    PITCH_NEG_LIMIT,
-    PITCH_POS_LIMIT,
     PUBLISH_RATE_HZ,
     WRIST_RPY_ALPHA,
     WRIST_RPY_MAX_RAD,
@@ -119,6 +115,9 @@ def _pose_quat_xyzw(pose: Optional[Pose]) -> Optional[np.ndarray]:
 
 
 def _roll_pitch_degrees(pose: Optional[Pose]) -> tuple[Optional[float], Optional[float]]:
+    # Currently unused: torso pitch teleop from head orientation was removed
+    # when the policy command dropped its pitch slot. Kept for reference in
+    # case head-orientation teleop is reintroduced.
     if pose is None:
         return None, None
     q = pose.orientation
@@ -201,7 +200,6 @@ class PolicyCommand:
     vx: float = 0.0
     vy: float = 0.0
     yaw_rate: float = 0.0
-    pitch_offset: float = 0.0
     height_offset: float = 0.0
     left_hand_offset: np.ndarray = field(default_factory=lambda: np.zeros(3, dtype=np.float32))
     right_hand_offset: np.ndarray = field(default_factory=lambda: np.zeros(3, dtype=np.float32))
@@ -223,8 +221,6 @@ class TeleVuerXrCommandSource:
     RIGHT_HAND_NEG_LIMIT_XYZ = HAND_NEG_LIMIT_XYZ
     LEFT_HAND_POS_LIMIT_XYZ = LEFT_HAND_POS_LIMIT_XYZ
     LEFT_HAND_NEG_LIMIT_XYZ = LEFT_HAND_NEG_LIMIT_XYZ
-    PITCH_POS_LIMIT = PITCH_POS_LIMIT
-    PITCH_NEG_LIMIT = PITCH_NEG_LIMIT
     HEIGHT_POS_LIMIT = HEIGHT_POS_LIMIT
     HEIGHT_NEG_LIMIT = HEIGHT_NEG_LIMIT
 
@@ -258,7 +254,6 @@ class TeleVuerXrCommandSource:
         self._wrist_rpy_max_rad = WRIST_RPY_MAX_RAD.copy()
         self._wrist_rpy_outlier_jump_rad = WRIST_RPY_OUTLIER_JUMP_RAD.copy()
 
-        self._default_pitch_offset = float(DEFAULT_PITCH)
         self._default_height_offset = float(DEFAULT_HEIGHT_OFFSET)
         self._default_left_hand_offset = np.array(
             [DEFAULT_HAND_X, -DEFAULT_HAND_Y, DEFAULT_HAND_Z], dtype=np.float32
@@ -277,10 +272,8 @@ class TeleVuerXrCommandSource:
         self.left_wrist_pos: Optional[np.ndarray] = None
         self.right_wrist_pos: Optional[np.ndarray] = None
         self.head_z: Optional[float] = None
-        self.head_pitch_deg: Optional[float] = None
         self.left_wrist_quat: np.ndarray = np.array([0.0, 0.0, 0.0, 1.0], dtype=np.float32)
         self.right_wrist_quat: np.ndarray = np.array([0.0, 0.0, 0.0, 1.0], dtype=np.float32)
-        self.head_roll_deg = 0.0
 
         # Button edge tracking mirrors the current HANDOFF DDS controller.
         self.left_a_pressed = False
@@ -294,7 +287,6 @@ class TeleVuerXrCommandSource:
         self._left_wrist_samples: list[np.ndarray] = []
         self._right_wrist_samples: list[np.ndarray] = []
         self._head_z_samples: list[float] = []
-        self._head_pitch_samples: list[float] = []
         self._left_wrist_quat_samples: list[np.ndarray] = []
         self._right_wrist_quat_samples: list[np.ndarray] = []
         self.neutral_ready = False
@@ -303,10 +295,8 @@ class TeleVuerXrCommandSource:
         self.neutral_left_wrist_quat = np.array([0.0, 0.0, 0.0, 1.0], dtype=np.float32)
         self.neutral_right_wrist_quat = np.array([0.0, 0.0, 0.0, 1.0], dtype=np.float32)
         self.neutral_head_z = 0.0
-        self.neutral_head_pitch_deg = 0.0
 
         self.cmd = PolicyCommand(
-            pitch_offset=self._default_pitch_offset,
             height_offset=self._default_height_offset,
             left_hand_offset=self._default_left_hand_offset.copy(),
             right_hand_offset=self._default_right_hand_offset.copy(),
@@ -348,7 +338,7 @@ class TeleVuerXrCommandSource:
         print("  left/right thumbstick -> vx / vy / yaw (controller tracking only)")
         print("  left/right trigger    -> left/right gripper open length "
               f"(0..{self._gripper_max_open_m * 100.0:.0f} cm; released=open, pressed=closed)")
-        print("  head pose -> torso pitch / height")
+        print("  head pose -> torso height")
         print("  tracked wrist poses -> left/right hand references")
         print("  Left-A  : toggle reset-hold mode")
         print("  Left-B  : recalibrate neutral pose")
@@ -431,17 +421,10 @@ class TeleVuerXrCommandSource:
         )
 
         self.head_z = None
-        self.head_pitch_deg = None
-        self.head_roll_deg = 0.0
         head_pose = getattr(tele_data, "head_pose", None)
         head_pos = _pose_pos3(head_pose)
-        head_roll_deg, head_pitch_deg = _roll_pitch_degrees(head_pose)
         if head_pos is not None:
             self.head_z = float(head_pos[2])
-        if head_pitch_deg is not None:
-            self.head_pitch_deg = float(head_pitch_deg)
-        if head_roll_deg is not None:
-            self.head_roll_deg = float(head_roll_deg)
 
         self._handle_left_a(bool(getattr(tele_data, "left_ctrl_aButton", False)))
         self._handle_left_b(bool(getattr(tele_data, "left_ctrl_bButton", False)))
@@ -452,7 +435,6 @@ class TeleVuerXrCommandSource:
         left_wrist_pos = self.left_wrist_pos
         right_wrist_pos = self.right_wrist_pos
         head_z = self.head_z
-        head_pitch_deg = self.head_pitch_deg
         left_wrist_quat = self.left_wrist_quat
         right_wrist_quat = self.right_wrist_quat
 
@@ -460,7 +442,6 @@ class TeleVuerXrCommandSource:
             left_wrist_pos is None
             or right_wrist_pos is None
             or head_z is None
-            or head_pitch_deg is None
             or not _normalize_quat_xyzw(left_wrist_quat)[1]
             or not _normalize_quat_xyzw(right_wrist_quat)[1]
         ):
@@ -468,7 +449,6 @@ class TeleVuerXrCommandSource:
         self._left_wrist_samples.append(left_wrist_pos.copy())
         self._right_wrist_samples.append(right_wrist_pos.copy())
         self._head_z_samples.append(float(head_z))
-        self._head_pitch_samples.append(float(head_pitch_deg))
 
         left_q, _ = _normalize_quat_xyzw(left_wrist_quat)
         right_q, _ = _normalize_quat_xyzw(right_wrist_quat)
@@ -485,19 +465,17 @@ class TeleVuerXrCommandSource:
             self.neutral_left_wrist_quat = _mean_quat_xyzw(self._left_wrist_quat_samples)
             self.neutral_right_wrist_quat = _mean_quat_xyzw(self._right_wrist_quat_samples)
             self.neutral_head_z = float(np.mean(self._head_z_samples))
-            self.neutral_head_pitch_deg = float(np.mean(self._head_pitch_samples))
             self.neutral_ready = True
             print(
                 "TeleVuer neutral calibration complete: "
                 f"left={self.neutral_left_wrist}, right={self.neutral_right_wrist}, "
-                f"head_z={self.neutral_head_z:.3f}, head_pitch_deg={self.neutral_head_pitch_deg:.2f}"
+                f"head_z={self.neutral_head_z:.3f}"
             )
 
     def _start_neutral_calibration(self, trigger: str = "manual"):
         self._left_wrist_samples.clear()
         self._right_wrist_samples.clear()
         self._head_z_samples.clear()
-        self._head_pitch_samples.clear()
         self._left_wrist_quat_samples.clear()
         self._right_wrist_quat_samples.clear()
         self.neutral_ready = False
@@ -514,7 +492,6 @@ class TeleVuerXrCommandSource:
         self.output_right_hand_offset[:] = self._default_right_hand_offset
         self._held_left_hand_offset[:] = self._default_left_hand_offset
         self._held_right_hand_offset[:] = self._default_right_hand_offset
-        self.cmd.pitch_offset = self._default_pitch_offset
         self.cmd.height_offset = self._default_height_offset
         self.cmd.left_hand_offset = self._default_left_hand_offset.copy()
         self.cmd.right_hand_offset = self._default_right_hand_offset.copy()
@@ -573,7 +550,6 @@ class TeleVuerXrCommandSource:
         self.cmd.vx = 0.0
         self.cmd.vy = 0.0
         self.cmd.yaw_rate = 0.0
-        self.cmd.pitch_offset = self._default_pitch_offset
         self.cmd.height_offset = self._default_height_offset
 
         self.filtered_left_wrist_rpy[:] = 0.0
@@ -701,14 +677,6 @@ class TeleVuerXrCommandSource:
             (1.0 - HAND_ALPHA) * self.output_right_hand_offset + HAND_ALPHA * target_right
         )
 
-        if self.neutral_ready and self.head_pitch_deg is not None:
-            pitch_offset = self._default_pitch_offset + np.deg2rad(
-                self.head_pitch_deg - self.neutral_head_pitch_deg
-            ) * 0.35
-            self.cmd.pitch_offset = float(np.clip(pitch_offset, self.PITCH_NEG_LIMIT, self.PITCH_POS_LIMIT))
-        else:
-            self.cmd.pitch_offset = self._default_pitch_offset
-
         if self.neutral_ready and self.head_z is not None:
             head_dz = float(self.head_z - self.neutral_head_z)
             height_offset = self._default_height_offset + head_dz * HEAD_HEIGHT_SCALE
@@ -743,7 +711,6 @@ class TeleVuerXrCommandSource:
             vx=float(self._output_vx),
             vy=float(self._output_vy),
             yaw_rate=float(self._output_yaw_rate),
-            pitch_offset=float(self.cmd.pitch_offset),
             height_offset=float(self.cmd.height_offset),
             left_hand_offset=self.cmd.left_hand_offset.copy(),
             right_hand_offset=self.cmd.right_hand_offset.copy(),
@@ -852,7 +819,6 @@ class DdsXrNode(Node):
                 cmd[CMD_VX] = float(src.vx)
                 cmd[CMD_VY] = float(src.vy)
                 cmd[CMD_YAW_RATE] = float(src.yaw_rate)
-                cmd[CMD_PITCH] = float(src.pitch_offset)
                 cmd[CMD_HEIGHT] = float(NOMINAL_ROOT_Z + src.height_offset)
                 cmd[CMD_LEFT_HAND:CMD_LEFT_HAND + 3] = NOMINAL_LEFT_HAND_BODY + src.left_hand_offset
                 cmd[CMD_RIGHT_HAND:CMD_RIGHT_HAND + 3] = NOMINAL_RIGHT_HAND_BODY + src.right_hand_offset

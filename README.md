@@ -8,6 +8,40 @@ Lizhi Yang, Junheng Li, Nehar Poddar, Yiling Hou, Gio Huh, Robert Griffin, Georg
 
 ![HANDOFF](https://lzyang2000.github.io/HANDOFF/static/images/head.jpg)
 
+## News
+
+**2026-06-10**. The deployment policy has been updated. A freshly distilled
+checkpoint is now bundled at `deploy/ckpt/policy.onnx`, and the deployment
+scripts (`deploy/play_sim_hand.sh`, `deploy/play_real_hand.sh`) fall back to it
+automatically when no local training run is found.
+   - Disclaimer: the bundled policy is provided for convenience and has been
+     validated in simulation. **Deploy on real hardware at your own risk** —
+     always verify behavior in sim first, keep an e-stop within reach, and start
+     in a safe, clear workspace.
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <video src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/handoffwalk.mp4" autoplay loop muted playsinline width="100%"></video>
+      <br><sub><b>Walking</b></sub>
+    </td>
+    <td align="center" width="50%">
+      <video src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/handoffsquat.mp4" autoplay loop muted playsinline width="100%"></video>
+      <br><sub><b>Squatting</b></sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <video src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/handoffbend.mp4" autoplay loop muted playsinline width="100%"></video>
+      <br><sub><b>Bending</b></sub>
+    </td>
+    <td align="center" width="50%">
+      <video src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/handoffgetup.mp4" autoplay loop muted playsinline width="100%"></video>
+      <br><sub><b>Fall recovery / get-up</b></sub>
+    </td>
+  </tr>
+</table>
+
 ## Overview
 
 This is the framework for the HANDOFF paper (*Humanoid Agentic Task-Space
@@ -228,6 +262,73 @@ hardware node, and the chosen controller (`none` / `keyboard` / `xbox` / `vr`).
 
 > Always verify a checkpoint in sim2sim before running it on hardware — a wrong
 > obs/action layout shows up as a soft glitch in sim but a fall on the real G1.
+
+### Controllers
+
+Every controller is a ROS 2 node that publishes the same **18-float unified
+command** on `/g1/command` (planar base velocity, torso height, bilateral hand
+targets, wrist RPY, grippers — layout in `deploy/common/command.py`); the policy
+node subscribes and turns it into the 10-D task-space command the student
+consumes. They differ only in how they *fill* that vector.
+
+#### xbox (`deploy/controller/xbox_node.py`)
+
+A gamepad mapped to incremental command edits, published at a fixed rate. Two
+input sources select the same mapping:
+
+- **local pad** (`xbox`): an evdev controller read through the `inputs` library
+  on a background thread.
+- **browser bridge** (`xbox server`): the shared `GamepadBridgeServer` exposes a
+  page at `http://localhost:8765`; any W3C-Gamepad-API pad connected to that
+  browser drives the robot over a websocket. The JS integrates triggers/D-pad
+  locally and ships absolute values, so no controller need be plugged into the
+  deploy host.
+
+Mapping (both sources):
+
+| Input | Command |
+|-------|---------|
+| Left stick X / Y | `vy` / `vx` (lateral / forward base velocity) |
+| Right stick X | `yaw_rate` |
+| LT / RT | torso height down / up |
+| D-pad up-down / left-right | right-hand `x` (fwd/back) / `y` (lateral) |
+| LB / RB | right-hand `z` (down / up) |
+| Start / Back | reset all commands to defaults |
+
+Sticks map to absolute velocities (with a deadzone); triggers, D-pad and
+bumpers *integrate* the height and right-hand offsets at fixed speeds. The
+**left hand is mirrored** from the right (same `x`/`z`, negated `y`), and all
+state is clamped to the per-axis limits in `teleop_common.py` before the
+nominal body pose is added and the command published.
+
+#### vr / dds (`deploy/controller/dds_xr_node.py`)
+
+A TeleVuer-driven XR teleop node. It hosts
+a Vuer webserver (the `https://<lan-ip>:8012?ws=...` URLs are printed at
+startup) that an XR headset connects to over WiFi; the headset streams head,
+wrist and controller pose data back, which the node converts into commands. Two
+modes:
+
+- **controller tracking** (default): thumbsticks drive base velocity, tracked
+  wrist poses drive the hand targets.
+- **hand tracking** (`--use_hand_tracking 1`): tracked wrists drive the hands,
+  but base velocity is held at zero (no thumbstick axes exist).
+
+Because XR poses are absolute in the headset frame, the node first runs a
+**neutral calibration** (averages ~30 samples of both wrists + head height) and
+thereafter commands *deltas from neutral*. Mapping:
+
+- left / right thumbstick → `vx` / `vy` / `yaw_rate`
+- tracked wrist positions → left / right hand targets (offset from the
+  calibrated neutral, per-axis clamped)
+- head height → torso height
+- triggers → gripper opening (released = open, pressed = closed)
+
+Four buttons act as mode toggles: **X** reset-hold (robot stands and ignores
+tracking — the safe default at startup), **Y** recalibrate neutral, **A** hand
+hold/follow, **B** wrist roll-pitch-yaw actuation. Outputs are heavily smoothed (velocity EMA, hand-offset and wrist-RPY
+low-pass, plus outlier-jump rejection on wrist orientation) so headset jitter
+doesn't reach the policy.
 
 ## Repo layout
 

@@ -342,13 +342,13 @@ STAND_VEL_THRESHOLD = 0.1
 CMD_VX = 0
 CMD_VY = 1
 CMD_YAW_RATE = 2
-CMD_HEIGHT = 4
-CMD_LEFT_HAND = 5
-CMD_RIGHT_HAND = 8
-CMD_LEFT_WRIST = 11
-CMD_RIGHT_WRIST = 14
-CMD_LEFT_GRIPPER = 17
-CMD_RIGHT_GRIPPER = 18
+CMD_HEIGHT = 3
+CMD_LEFT_HAND = 4
+CMD_RIGHT_HAND = 7
+CMD_LEFT_WRIST = 10
+CMD_RIGHT_WRIST = 13
+CMD_LEFT_GRIPPER = 16
+CMD_RIGHT_GRIPPER = 17
 # Gate the wrist leveler to the pick-approach rise: commanded hand z
 # body-frame is above this threshold, AND the gripper is still open
 # (pre-grasp). Covers the "initial lift before lowering/closing" only,

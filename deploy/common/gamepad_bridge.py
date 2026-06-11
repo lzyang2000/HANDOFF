@@ -1,7 +1,7 @@
 """Browser-based gamepad bridge shared by the mjlab play flow and sim2sim.
 
 Serves an HTML page that polls the Web Gamepad API, streams absolute state
-(vx, vy, yaw, height, pitch, hand offsets) over WebSocket to the server,
+(vx, vy, yaw, height, hand offsets) over WebSocket to the server,
 and exposes the aggregated state via ``GamepadBridgeServer.get_state()``.
 
 Used by:
@@ -11,7 +11,7 @@ Used by:
     republishes as ``Float32MultiArray`` on ``/g1/command``.
 
 The browser integrates continuous axes (triggers → height, D-pad → hand
-offset, A/Y → pitch) locally; the server clamps to limits and is
+offset) locally; the server clamps to limits and is
 authoritative. Overlay resets to nominal on client disconnect.
 """
 
@@ -35,11 +35,9 @@ class BridgeConfig:
   max_vx: float
   max_vy: float
   max_yaw: float
-  # Torso height / pitch limits.
+  # Torso height limits.
   height_min: float
   height_max: float
-  pitch_pos_limit: float
-  pitch_neg_limit: float
   # Right-hand offset limits (body frame). Left limits mirror y.
   hand_pos_limit_xyz: Sequence[float]
   hand_neg_limit_xyz: Sequence[float]
@@ -47,7 +45,6 @@ class BridgeConfig:
   left_hand_neg_limit_xyz: Sequence[float]
   # Defaults (what ``reset_state()`` returns to).
   default_height: float
-  default_pitch: float
   default_hand_x: float
   default_hand_y: float
   default_hand_z: float
@@ -56,7 +53,6 @@ class BridgeConfig:
   tick_hz: float
   gamepad_hand_speed: float
   gamepad_height_speed: float
-  gamepad_pitch_speed: float
   # Network.
   host: str = "0.0.0.0"
   http_port: int = 8765
@@ -110,7 +106,6 @@ class GamepadBridgeServer:
       "vy": 0.0,
       "yaw": 0.0,
       "height": c.default_height,
-      "pitch": c.default_pitch,
       "right_hand": self._default_right_offset(),
       "left_hand": self._default_left_offset(),
       "loco_active": True,
@@ -241,7 +236,6 @@ class GamepadBridgeServer:
       vy = float(data.get("vy", 0.0))
       yaw = float(data.get("yaw", 0.0))
       height = float(data.get("height", c.default_height))
-      pitch = float(data.get("pitch", c.default_pitch))
       right = [float(x) for x in data.get("right_hand", self._default_right_offset())]
       left = [float(x) for x in data.get("left_hand", self._default_left_offset())]
     except (TypeError, ValueError):
@@ -262,9 +256,6 @@ class GamepadBridgeServer:
       )
       self.state["left_hand"] = np.clip(
         np.array(left, dtype=np.float32), lhn, lhp
-      )
-      self.state["pitch"] = float(
-        np.clip(pitch, c.pitch_neg_limit, c.pitch_pos_limit)
       )
 
   # ------------------------------------------------------------ HTML
@@ -312,7 +303,6 @@ class GamepadBridgeServer:
 
 <h3>Torso</h3>
 <div class="row"><span class="label">height</span><span class="val" id="height">{c.default_height:.3f}</span></div>
-<div class="row"><span class="label">pitch</span><span class="val" id="pitch">{c.default_pitch:+.3f}</span></div>
 
 <h3>Right hand offset (body frame)</h3>
 <div class="row"><span class="label">r-x</span><span class="val" id="rx">{c.default_hand_x:+.3f}</span></div>
@@ -329,7 +319,7 @@ class GamepadBridgeServer:
 <div class="row"><span class="label">axes</span><span id="raw_axis" style="font-size:12px;color:#cfc">—</span></div>
 
 <footer>
-  Sticks = vx/vy/yaw · LT/RT = height - / + · D-pad = right-hand X/Y · LB/RB = right-hand Z · A/Y = pitch · Start/Back = reset to nominal.<br/>
+  Sticks = vx/vy/yaw · LT/RT = height - / + · D-pad = right-hand X/Y · LB/RB = right-hand Z · Start/Back = reset to nominal.<br/>
   Server clamps to limits and is authoritative. Close the tab or unplug the pad → overlay resets to nominal on the server.<br/>
   <br/>
   W3C standard: <code>buttons[0]=A, [3]=Y, [4]=LB, [5]=RB, [6]=LT, [7]=RT, [8]=Back, [9]=Start, [12..15]=dpad</code>
@@ -342,14 +332,12 @@ class GamepadBridgeServer:
   const TICK_HZ = {c.tick_hz};
   const MAX_VX = {c.max_vx}, MAX_VY = {c.max_vy}, MAX_YAW = {c.max_yaw};
   const HEIGHT_MIN = {c.height_min}, HEIGHT_MAX = {c.height_max};
-  const PITCH_POS = {c.pitch_pos_limit}, PITCH_NEG = {c.pitch_neg_limit};
   const HAND_POS = [{hp[0]}, {hp[1]}, {hp[2]}];
   const HAND_NEG = [{hn[0]}, {hn[1]}, {hn[2]}];
   const HAND_SPEED = {c.gamepad_hand_speed};
   const HEIGHT_SPEED = {c.gamepad_height_speed};
-  const PITCH_SPEED = {c.gamepad_pitch_speed};
   const DEFAULTS = {{
-    height: {c.default_height}, pitch: {c.default_pitch},
+    height: {c.default_height},
     rx: {c.default_hand_x}, ry: {c.default_hand_y}, rz: {c.default_hand_z},
   }};
   // Reset glides integrated state back to defaults over ~RESET_TAU seconds
@@ -363,7 +351,7 @@ class GamepadBridgeServer:
   const padEl = document.getElementById('pad');
   let ws = null;
   let state = {{
-    height: DEFAULTS.height, pitch: DEFAULTS.pitch,
+    height: DEFAULTS.height,
     rx: DEFAULTS.rx, ry: DEFAULTS.ry, rz: DEFAULTS.rz,
   }};
   let lastStart = 0;
@@ -462,7 +450,7 @@ class GamepadBridgeServer:
       //       axes[9] = POV hat: -1=up, -0.71=up-right, -0.43=right,
       //               -0.14=dn-right, 0.14=down, 0.43=dn-left, 0.71=left,
       //               1.0=up-left, |v|>1 released.
-      let lt, rt, lb, rb, btnA, btnY, dUp, dDn, dLt, dRt, start;
+      let lt, rt, lb, rb, dUp, dDn, dLt, dRt, start;
       if (p.mapping === 'standard') {{
         const ax4 = p.axes[4], ax5 = p.axes[5];
         if (ax4 !== undefined && ax4 < -0.5) triggerAxisActive.lt = true;
@@ -473,8 +461,6 @@ class GamepadBridgeServer:
         rt = Math.max((p.buttons[7] && p.buttons[7].value) || 0, rtAx);
         lb = (p.buttons[4] && p.buttons[4].pressed) ? 1 : 0;
         rb = (p.buttons[5] && p.buttons[5].pressed) ? 1 : 0;
-        btnA = (p.buttons[0] && p.buttons[0].pressed) ? 1 : 0;
-        btnY = (p.buttons[3] && p.buttons[3].pressed) ? 1 : 0;
         dUp = (p.buttons[12] && p.buttons[12].pressed) ? 1 : 0;
         dDn = (p.buttons[13] && p.buttons[13].pressed) ? 1 : 0;
         dLt = (p.buttons[14] && p.buttons[14].pressed) ? 1 : 0;
@@ -487,8 +473,6 @@ class GamepadBridgeServer:
         rt = (p.buttons[9] && p.buttons[9].value) || 0;
         lb = (p.buttons[6] && p.buttons[6].pressed) ? 1 : 0;
         rb = (p.buttons[7] && p.buttons[7].pressed) ? 1 : 0;
-        btnA = (p.buttons[0] && p.buttons[0].pressed) ? 1 : 0;
-        btnY = (p.buttons[4] && p.buttons[4].pressed) ? 1 : 0;
 
         dUp = 0; dDn = 0; dLt = 0; dRt = 0;
         const hat = p.axes[9];
@@ -536,24 +520,20 @@ class GamepadBridgeServer:
       if (resetActive) {{
         const a = 1 - Math.exp(-dt / RESET_TAU);
         state.height = lerpField(state.height, DEFAULTS.height, a);
-        state.pitch  = lerpField(state.pitch,  DEFAULTS.pitch,  a);
         state.rx     = lerpField(state.rx,     DEFAULTS.rx,     a);
         state.ry     = lerpField(state.ry,     DEFAULTS.ry,     a);
         state.rz     = lerpField(state.rz,     DEFAULTS.rz,     a);
         if (Math.abs(state.height - DEFAULTS.height) < RESET_EPS &&
-            Math.abs(state.pitch  - DEFAULTS.pitch)  < RESET_EPS &&
             Math.abs(state.rx     - DEFAULTS.rx)     < RESET_EPS &&
             Math.abs(state.ry     - DEFAULTS.ry)     < RESET_EPS &&
             Math.abs(state.rz     - DEFAULTS.rz)     < RESET_EPS) {{
-          state.height = DEFAULTS.height; state.pitch = DEFAULTS.pitch;
+          state.height = DEFAULTS.height;
           state.rx = DEFAULTS.rx; state.ry = DEFAULTS.ry; state.rz = DEFAULTS.rz;
           resetActive = false;
         }}
       }} else {{
         if (rt > 0.1) state.height = clamp(state.height + HEIGHT_SPEED * rt * scale, HEIGHT_MIN, HEIGHT_MAX);
         if (lt > 0.1) state.height = clamp(state.height - HEIGHT_SPEED * lt * scale, HEIGHT_MIN, HEIGHT_MAX);
-        if (btnY) state.pitch = clamp(state.pitch + PITCH_SPEED * scale, PITCH_NEG, PITCH_POS);
-        if (btnA) state.pitch = clamp(state.pitch - PITCH_SPEED * scale, PITCH_NEG, PITCH_POS);
         if (dUp) state.rx = clamp(state.rx + HAND_SPEED * scale, HAND_NEG[0], HAND_POS[0]);
         if (dDn) state.rx = clamp(state.rx - HAND_SPEED * scale, HAND_NEG[0], HAND_POS[0]);
         if (dLt) state.ry = clamp(state.ry + HAND_SPEED * scale, HAND_NEG[1], HAND_POS[1]);
@@ -575,7 +555,6 @@ class GamepadBridgeServer:
       document.getElementById('yaw').textContent = fmt(yaw);
       setBar('vx-bar', vx); setBar('vy-bar', vy); setBar('yaw-bar', yaw);
       document.getElementById('height').textContent = state.height.toFixed(3);
-      document.getElementById('pitch').textContent = fmt(state.pitch);
       document.getElementById('rx').textContent = fmt(state.rx);
       document.getElementById('ry').textContent = fmt(state.ry);
       document.getElementById('rz').textContent = fmt(state.rz);
@@ -586,7 +565,7 @@ class GamepadBridgeServer:
       if (ws && ws.readyState === 1) {{
         ws.send(JSON.stringify({{
           vx: vx * MAX_VX, vy: vy * MAX_VY, yaw: yaw * MAX_YAW,
-          height: state.height, pitch: state.pitch,
+          height: state.height,
           right_hand: [state.rx, state.ry, state.rz],
           left_hand: [state.rx, -state.ry, state.rz],
           sticks_touched: (vx !== 0 || vy !== 0 || yaw !== 0),

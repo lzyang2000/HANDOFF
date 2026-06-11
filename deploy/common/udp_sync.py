@@ -6,9 +6,9 @@ latency-critical state→action path.
 
 Protocol (all values float32, little-endian):
 
-  State packet (sim → policy):  91 floats = 364 bytes
+  State packet (sim → policy):  90 floats = 360 bytes
     [step_id(1), quat_wxyz(4), pos_xyz(3), body_lin_vel(3), body_ang_vel(3),
-     joint_pos(29), joint_vel(29), command(19)]
+     joint_pos(29), joint_vel(29), command(18)]
 
   Action packet (policy → sim):  30 floats = 120 bytes
     [step_id(1), target_pos(29)]
@@ -31,10 +31,10 @@ UDP_HOST = "127.0.0.1"
 
 # Packet sizes
 NUM_JOINTS = 29
-CMD_SIZE = 19
-STATE_FLOATS = 1 + 4 + 3 + 3 + 3 + NUM_JOINTS + NUM_JOINTS + CMD_SIZE  # 91
+CMD_SIZE = 18
+STATE_FLOATS = 1 + 4 + 3 + 3 + 3 + NUM_JOINTS + NUM_JOINTS + CMD_SIZE  # 90
 ACTION_FLOATS = 1 + NUM_JOINTS  # 30
-STATE_BYTES = STATE_FLOATS * 4   # 364
+STATE_BYTES = STATE_FLOATS * 4   # 360
 ACTION_BYTES = ACTION_FLOATS * 4  # 120
 
 

@@ -5,7 +5,6 @@ Matches the HANDOFF shared_hand_command.py JoystickController keyboard layout:
   A/D:   vy + / -
   Q/E:   yaw + / -
   U/I:   height up / down
-  O/P:   pitch up / down
   Arrows: hand forward/back/left/right
   . / ,: hand up / down
   Z/X:   left wrist roll + / -
@@ -32,7 +31,6 @@ from deploy.common.command import (
     CMD_LEFT_GRIPPER,
     CMD_LEFT_HAND,
     CMD_LEFT_WRIST,
-    CMD_PITCH,
     CMD_RIGHT_GRIPPER,
     CMD_RIGHT_HAND,
     CMD_RIGHT_WRIST,
@@ -59,7 +57,6 @@ from teleop_common import (
     KEYBOARD_GRIPPER_STEP,
     KEYBOARD_HAND_STEP,
     KEYBOARD_HEIGHT_STEP,
-    KEYBOARD_PITCH_STEP,
     KEYBOARD_VX_STEP,
     KEYBOARD_VY_STEP,
     KEYBOARD_WRIST_ROLL_STEP,
@@ -69,8 +66,6 @@ from teleop_common import (
     MAX_VX,
     MAX_VY,
     MAX_YAW,
-    PITCH_NEG_LIMIT,
-    PITCH_POS_LIMIT,
     PUBLISH_RATE_HZ,
     WRIST_ROLL_LIMIT,
 )
@@ -87,7 +82,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 _ALLOWED_CHARS = frozenset((
     "w", "a", "s", "d", "q", "e",       # loco
-    "u", "i", "o", "p",                   # height, pitch
+    "u", "i",                              # height
     ",", ".",                              # hand z
     "z", "x", "c", "v",                   # wrist roll
     "g", "h", "j", "k", "n", "m",         # grippers
@@ -199,7 +194,6 @@ class KeyboardNode(Node):
         self._vy = 0.0
         self._yaw = 0.0
         # Torso
-        self._pitch = float(NOMINAL_COMMAND[CMD_PITCH])
         self._height = float(NOMINAL_COMMAND[CMD_HEIGHT])
         # Hands (offsets from nominal body-frame positions)
         self._right_hand = np.array([DEFAULT_HAND_X, DEFAULT_HAND_Y, DEFAULT_HAND_Z], dtype=np.float32)
@@ -233,7 +227,6 @@ class KeyboardNode(Node):
         print("  A/D: vy + / -")
         print("  Q/E: yaw + / -")
         print("  U/I: height up / down")
-        print("  O/P: pitch up / down")
         print("  Arrows: hand forward/back/left/right")
         print("  . / ,: hand up / down")
         print("  Z/X: left wrist roll + / -")
@@ -248,7 +241,6 @@ class KeyboardNode(Node):
         self._vx = 0.0
         self._vy = 0.0
         self._yaw = 0.0
-        self._pitch = float(NOMINAL_COMMAND[CMD_PITCH])
         self._height = float(NOMINAL_COMMAND[CMD_HEIGHT])
         self._right_hand[:] = [DEFAULT_HAND_X, DEFAULT_HAND_Y, DEFAULT_HAND_Z]
         self._left_hand[:] = [DEFAULT_HAND_X, -DEFAULT_HAND_Y, DEFAULT_HAND_Z]
@@ -261,7 +253,6 @@ class KeyboardNode(Node):
         self._vx = float(np.clip(self._vx, -MAX_VX, MAX_VX))
         self._vy = float(np.clip(self._vy, -MAX_VY, MAX_VY))
         self._yaw = float(np.clip(self._yaw, -MAX_YAW, MAX_YAW))
-        self._pitch = float(np.clip(self._pitch, PITCH_NEG_LIMIT, PITCH_POS_LIMIT))
         self._height = float(np.clip(self._height, HEIGHT_MIN, HEIGHT_MAX))
         self._right_hand = np.clip(self._right_hand, HAND_NEG_LIMIT_XYZ, HAND_POS_LIMIT_XYZ)
         self._left_hand = np.clip(self._left_hand, LEFT_HAND_NEG_LIMIT_XYZ, LEFT_HAND_POS_LIMIT_XYZ)
@@ -285,15 +276,11 @@ class KeyboardNode(Node):
                 self._yaw += KEYBOARD_YAW_STEP
             elif token == "e":
                 self._yaw -= KEYBOARD_YAW_STEP
-            # Height / pitch
+            # Height
             elif token == "u":
                 self._height += KEYBOARD_HEIGHT_STEP
             elif token == "i":
                 self._height -= KEYBOARD_HEIGHT_STEP
-            elif token == "o":
-                self._pitch += KEYBOARD_PITCH_STEP
-            elif token == "p":
-                self._pitch -= KEYBOARD_PITCH_STEP
             # Hand position
             elif token == "UP":
                 self._right_hand[0] += KEYBOARD_HAND_STEP
@@ -351,7 +338,7 @@ class KeyboardNode(Node):
 
             print(
                 f"vx={self._vx:+.2f} vy={self._vy:+.2f} yaw={self._yaw:+.2f}"
-                f"  h={self._height:.3f} p={self._pitch:+.3f}"
+                f"  h={self._height:.3f}"
                 f"  hand_r=[{self._right_hand[0]:+.2f},{self._right_hand[1]:+.2f},{self._right_hand[2]:+.2f}]"
                 f"  grip=[{self._left_gripper:.2f},{self._right_gripper:.2f}]"
             )
@@ -362,7 +349,6 @@ class KeyboardNode(Node):
             cmd[CMD_VX] = self._vx
             cmd[CMD_VY] = self._vy
             cmd[CMD_YAW_RATE] = self._yaw
-            cmd[CMD_PITCH] = self._pitch
             cmd[CMD_HEIGHT] = self._height
             cmd[CMD_LEFT_HAND:CMD_LEFT_HAND + 3] = NOMINAL_LEFT_HAND_BODY + self._left_hand
             cmd[CMD_RIGHT_HAND:CMD_RIGHT_HAND + 3] = NOMINAL_RIGHT_HAND_BODY + self._right_hand
