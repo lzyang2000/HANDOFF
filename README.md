@@ -22,21 +22,21 @@ automatically when no local training run is found.
 <table>
   <tr>
     <td align="center" width="50%">
-      <video src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/handoffwalk.mp4" autoplay loop muted playsinline width="100%"></video>
+      <img src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/walk.gif" width="100%">
       <br><sub><b>Walking</b></sub>
     </td>
     <td align="center" width="50%">
-      <video src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/handoffsquat.mp4" autoplay loop muted playsinline width="100%"></video>
+      <img src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/squat.gif" width="100%">
       <br><sub><b>Squatting</b></sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <video src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/handoffbend.mp4" autoplay loop muted playsinline width="100%"></video>
-      <br><sub><b>Bending</b></sub>
+      <img src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/benddown.gif" width="100%">
+      <br><sub><b>Bending down</b></sub>
     </td>
     <td align="center" width="50%">
-      <video src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/handoffgetup.mp4" autoplay loop muted playsinline width="100%"></video>
+      <img src="https://github.com/lzyang2000/HANDOFF/raw/main/videos/getup.gif" width="100%">
       <br><sub><b>Fall recovery / get-up</b></sub>
     </td>
   </tr>
