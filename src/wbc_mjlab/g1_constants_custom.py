@@ -21,15 +21,6 @@ import numpy as np
 from mjlab.asset_zoo.robots.unitree_g1.g1_constants import get_spec
 from mjlab.entity import EntityCfg
 
-# Uniform action scales (vs per-joint G1_ACTION_SCALE used by the non-Handoff tasks).
-HANDOFF_WBC_ACTION_SCALE: float = 0.5   # g1_mimic_config.py control.action_scale
-HANDOFF_LOCO_ACTION_SCALE: float = 0.25  # g1_loco_config.py control.action_scale
-
-# Raw action clipping (pre-computed: normalization.clip_actions / action_scale).
-# HANDOFF clips raw policy output before scaling: actions = clip(actions, -val, val).
-HANDOFF_WBC_RAW_ACTION_CLIP: float = 10.0  # 5.0 / 0.5  (g1_mimic_distill_config.py)
-HANDOFF_LOCO_RAW_ACTION_CLIP: float = 4.8  # 1.2 / 0.25 (LeggedRobotCfg default)
-
 ##
 # CBF (Control Barrier Function) parameters.
 ##

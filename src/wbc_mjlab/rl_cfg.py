@@ -10,11 +10,7 @@ from mjlab.tasks.tracking.config.g1.rl_cfg import unitree_g1_tracking_ppo_runner
 from wbc_mjlab.dagger_ppo_config import WbcDaggerAlgorithmCfg, WbcDaggerRunnerCfg
 from wbc_mjlab.dagger_ppo_config import WbcMoEDaggerAlgorithmCfg, WbcMoEModelCfg
 from wbc_mjlab.dagger_ppo_config import WbcTeacherSlotCfg, WbcTwistModelCfg
-from wbc_mjlab.g1_constants_custom import (
-  _WBC_SAVE_INTERVAL,
-  HANDOFF_LOCO_RAW_ACTION_CLIP,
-  HANDOFF_WBC_RAW_ACTION_CLIP,
-)
+from wbc_mjlab.g1_constants_custom import _WBC_SAVE_INTERVAL
 from wbc_mjlab import observations as wbc_obs
 
 
