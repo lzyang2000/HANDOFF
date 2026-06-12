@@ -3,12 +3,11 @@
 All module-level constants for wbc_mjlab live here so config.py, rl_cfg.py,
 and any future modules have a single import source.
 
-Actuator gains are taken directly from the HANDOFF IsaacGym training configs:
+The robot keeps mjlab's stock G1 actuator model (PD gains, effort limits, and
+armatures from the Unitree motor specs). Action scales and clipping below are
+taken from the HANDOFF IsaacGym training configs:
   - WBC teacher: HANDOFF/legged_gym/envs/g1/g1_mimic_config.py
   - Loco teacher: HANDOFF/legged_gym/envs/g1/g1_loco_config.py
-
-Physical effort limits and armatures are preserved from the mjlab g1_constants.py
-(derived from Unitree motor specs) for simulation accuracy.
 """
 
 from __future__ import annotations
@@ -19,51 +18,8 @@ from dataclasses import dataclass
 import mujoco
 import numpy as np
 
-from mjlab.actuator import BuiltinPositionActuatorCfg
-from mjlab.asset_zoo.robots.unitree_g1.g1_constants import (
-  ARMATURE_4010,
-  ARMATURE_5020,
-  ARMATURE_7520_14,
-  ARMATURE_7520_22,
-  ACTUATOR_4010,
-  ACTUATOR_5020,
-  ACTUATOR_7520_14,
-  ACTUATOR_7520_22,
-  FULL_COLLISION,
-  KNEES_BENT_KEYFRAME,
-  get_spec,
-)
-from mjlab.entity import EntityArticulationInfoCfg, EntityCfg
-
-##
-# HANDOFF PD gains (from IsaacGym g1_mimic_config.py / g1_loco_config.py).
-##
-
-# Stiffness [N·m/rad]
-HANDOFF_STIFFNESS: dict[str, float] = {
-  "hip_yaw": 100.0,
-  "hip_roll": 100.0,
-  "hip_pitch": 100.0,
-  "knee": 150.0,
-  "ankle": 40.0,
-  "waist": 150.0,
-  "shoulder": 40.0,
-  "elbow": 40.0,
-  "wrist": 40.0,
-}
-
-# Damping [N·m·s/rad]
-HANDOFF_DAMPING: dict[str, float] = {
-  "hip_yaw": 2.0,
-  "hip_roll": 2.0,
-  "hip_pitch": 2.0,
-  "knee": 4.0,
-  "ankle": 2.0,
-  "waist": 4.0,
-  "shoulder": 5.0,
-  "elbow": 5.0,
-  "wrist": 5.0,
-}
+from mjlab.asset_zoo.robots.unitree_g1.g1_constants import get_spec
+from mjlab.entity import EntityCfg
 
 # Uniform action scales (vs per-joint G1_ACTION_SCALE used by the non-Handoff tasks).
 HANDOFF_WBC_ACTION_SCALE: float = 0.5   # g1_mimic_config.py control.action_scale
@@ -110,108 +66,6 @@ SQUAT_SMOOTHING_ALPHA: float = 0.3     # EMA coefficient on the new action
 CAPTURE_POINT_PD_ENABLE: bool = True
 CAPTURE_POINT_METHOD: str = "cbf"      # "pd" or "cbf"
 CAPTURE_POINT_PD_KP: float = 5.0      # proportional gain (PD method only)
-
-##
-# HANDOFF BuiltinPositionActuatorCfg instances.
-#
-# Groups follow physical actuator type (to preserve correct effort_limit and armature),
-# with stiffness/damping overridden to HANDOFF integer values.
-# Waist and ankle joints use 4-bar linkages driven by two 5020 motors in parallel,
-# so their effort_limit and armature are doubled.
-##
-
-# hip_yaw + hip_pitch: 7520_14 motor, kp=100, kd=2
-_HANDOFF_ACTUATOR_HIP_PITCH_YAW = BuiltinPositionActuatorCfg(
-  target_names_expr=(".*_hip_yaw_joint", ".*_hip_pitch_joint"),
-  stiffness=HANDOFF_STIFFNESS["hip_yaw"],
-  damping=HANDOFF_DAMPING["hip_yaw"],
-  effort_limit=ACTUATOR_7520_14.effort_limit,
-  armature=ARMATURE_7520_14,
-)
-
-# waist_yaw: 7520_14 motor, kp=150, kd=4
-_HANDOFF_ACTUATOR_WAIST_YAW = BuiltinPositionActuatorCfg(
-  target_names_expr=("waist_yaw_joint",),
-  stiffness=HANDOFF_STIFFNESS["waist"],
-  damping=HANDOFF_DAMPING["waist"],
-  effort_limit=ACTUATOR_7520_14.effort_limit,
-  armature=ARMATURE_7520_14,
-)
-
-# hip_roll: 7520_22 motor, kp=100, kd=2
-_HANDOFF_ACTUATOR_HIP_ROLL = BuiltinPositionActuatorCfg(
-  target_names_expr=(".*_hip_roll_joint",),
-  stiffness=HANDOFF_STIFFNESS["hip_roll"],
-  damping=HANDOFF_DAMPING["hip_roll"],
-  effort_limit=ACTUATOR_7520_22.effort_limit,
-  armature=ARMATURE_7520_22,
-)
-
-# knee: 7520_22 motor, kp=150, kd=4
-_HANDOFF_ACTUATOR_KNEE = BuiltinPositionActuatorCfg(
-  target_names_expr=(".*_knee_joint",),
-  stiffness=HANDOFF_STIFFNESS["knee"],
-  damping=HANDOFF_DAMPING["knee"],
-  effort_limit=ACTUATOR_7520_22.effort_limit,
-  armature=ARMATURE_7520_22,
-)
-
-# ankle (pitch + roll): 4-bar linkage with 2×5020 motors, kp=40, kd=2
-_HANDOFF_ACTUATOR_ANKLE = BuiltinPositionActuatorCfg(
-  target_names_expr=(".*_ankle_pitch_joint", ".*_ankle_roll_joint"),
-  stiffness=HANDOFF_STIFFNESS["ankle"],
-  damping=HANDOFF_DAMPING["ankle"],
-  effort_limit=ACTUATOR_5020.effort_limit * 2,
-  armature=ARMATURE_5020 * 2,
-)
-
-# waist pitch + roll: 4-bar linkage with 2×5020 motors, kp=150, kd=4
-_HANDOFF_ACTUATOR_WAIST_PITCH_ROLL = BuiltinPositionActuatorCfg(
-  target_names_expr=("waist_pitch_joint", "waist_roll_joint"),
-  stiffness=HANDOFF_STIFFNESS["waist"],
-  damping=HANDOFF_DAMPING["waist"],
-  effort_limit=ACTUATOR_5020.effort_limit * 2,
-  armature=ARMATURE_5020 * 2,
-)
-
-# shoulder + elbow + wrist_roll: 5020 motor, kp=40, kd=5
-_HANDOFF_ACTUATOR_ARM = BuiltinPositionActuatorCfg(
-  target_names_expr=(
-    ".*_shoulder_pitch_joint",
-    ".*_shoulder_roll_joint",
-    ".*_shoulder_yaw_joint",
-    ".*_elbow_joint",
-    ".*_wrist_roll_joint",
-  ),
-  stiffness=HANDOFF_STIFFNESS["shoulder"],
-  damping=HANDOFF_DAMPING["shoulder"],
-  effort_limit=ACTUATOR_5020.effort_limit,
-  armature=ARMATURE_5020,
-)
-
-# wrist pitch + yaw: 4010 motor, kp=40, kd=5
-_HANDOFF_ACTUATOR_WRIST_PITCH_YAW = BuiltinPositionActuatorCfg(
-  target_names_expr=(".*_wrist_pitch_joint", ".*_wrist_yaw_joint"),
-  stiffness=HANDOFF_STIFFNESS["wrist"],
-  damping=HANDOFF_DAMPING["wrist"],
-  effort_limit=ACTUATOR_4010.effort_limit,
-  armature=ARMATURE_4010,
-)
-
-HANDOFF_G1_ARTICULATION = EntityArticulationInfoCfg(
-  actuators=(
-    _HANDOFF_ACTUATOR_HIP_PITCH_YAW,
-    _HANDOFF_ACTUATOR_WAIST_YAW,
-    _HANDOFF_ACTUATOR_HIP_ROLL,
-    _HANDOFF_ACTUATOR_KNEE,
-    _HANDOFF_ACTUATOR_ANKLE,
-    _HANDOFF_ACTUATOR_WAIST_PITCH_ROLL,
-    _HANDOFF_ACTUATOR_ARM,
-    _HANDOFF_ACTUATOR_WRIST_PITCH_YAW,
-  ),
-  soft_joint_pos_limit_factor=0.9,
-)
-
 
 ##
 # Sim-to-real hardware payloads: Jetson on back, Dex1-1 hands replacing
