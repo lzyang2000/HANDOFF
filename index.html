@@ -174,6 +174,15 @@
       margin: 0;
     }
     .cmd-cap strong { color: #FF6C0C; }
+    .cbf-filter-block { margin-top: 1.1rem; }
+    .cbf-filter-block .cbf-title { font-weight: 700; color: #FF6C0C; font-size: 0.95rem; margin-bottom: 0.4rem; }
+    .cbf-filter-block video {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #e6e9ef;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: block;
+    }
     .figure-caption { font-size: .9rem; color: #4a4a4a; margin-top: .6rem; }
     .results-table-wrap { overflow-x: auto; }
     table.handoff-table { font-size: .85rem; }
@@ -454,10 +463,11 @@
         <div class="content has-text-justified" style="margin-top:0.75rem;">
           <p>No single regime gives velocity tracking, whole-body manipulation, and fall recovery at once &mdash; so three specialists are distilled into one mixture-of-experts student under context-based action-sliced KL:</p>
           <ul>
-            <li><span class="teacher-tag">WBC</span> &mdash; 29-DoF motion tracking; posture, reach, squat, bimanual.</li>
-            <li><span class="teacher-tag">Locomotion</span> &mdash; 15-DoF body slice, velocity tracking.</li>
-            <li><span class="teacher-tag">Fall-recovery</span> &mdash; Adversarial Motion Prior on fall-and-recovery clips.</li>
+            <li><span class="teacher-tag">WBC</span> &mdash; 29-DoF motion imitation on retargeted human clips with center-of-pressure correction; arm- and body-slice KL.</li>
+            <li><span class="teacher-tag">Locomotion</span> &mdash; 15-DoF flat-terrain velocity control under arm perturbations; body-slice KL.</li>
+            <li><span class="teacher-tag">Fall-recovery</span> &mdash; 29-DoF recovery prior on masked fall-and-recovery clips; full-body KL.</li>
           </ul>
+          <p>A shared encoder and softmax gate blend the three experts into one 29-DoF action, smoothly shifting weight toward locomotion as commanded speed rises &mdash; no hard switching between regimes.</p>
           <p>All fuse into one policy under the single 10-D interface, with <strong>no runtime switching</strong>; a new specialist plugs in as one teacher head and one context channel.</p>
         </div>
       </div>
@@ -466,8 +476,17 @@
         <h2 class="title is-4 has-text-centered">An agentic planner</h2>
         <img src="static/images/agent.png" alt="Agentic deployment pipeline: natural-language instruction decomposed into atomic tasks, a VLM emits pelvis-frame waypoints, and a skill selector produces the 10-D command stream."/>
         <div class="content has-text-justified" style="margin-top:0.75rem;">
-          <p>A natural-language instruction is decomposed into atomic tasks; a VLM emits pelvis-frame waypoints from RGB-D, a tracker produces $(v_x, v_y, \omega_z)$, and a skill selector sets $z$ and wrist targets $p_{R/L}^P$. The 10-D stream feeds the controller at 50&nbsp;Hz, tracked on hardware at 500&nbsp;Hz.</p>
-          <p>Anything that emits the 10-D command works here &mdash; classical planning, agentic, or a VLA.</p>
+          <p>A natural-language instruction is split into atomic tasks; a VLM emits pelvis-frame waypoints from RGB-D, a tracker yields $(v_x, v_y, \omega_z)$, and a skill selector sets $z$ and wrist targets. The 10-D stream drives the controller at 50&nbsp;Hz on hardware &mdash; anything that emits it works, classical, agentic, or a VLA.</p>
+        </div>
+        <!-- Feasibility filtering of teacher data -->
+        <div class="cbf-filter-block">
+          <div class="cbf-title">Filtering teacher data for feasibility</div>
+          <figure>
+            <video poster="static/videos/cbf-filter_poster.jpg" autoplay loop muted playsinline preload="metadata">
+              <source src="static/videos/cbf-filter.mp4" type="video/mp4">
+            </video>
+            <figcaption class="figure-caption has-text-centered" style="margin-top:0.4rem;">A CBF filter keeps each teacher reference feasible &mdash; the center of pressure stays in support (<strong>filtered</strong>, left) instead of leaving the foot (<strong>unfiltered</strong>, right), so the student never learns infeasible motion.</figcaption>
+          </figure>
         </div>
       </div>
     </div>
